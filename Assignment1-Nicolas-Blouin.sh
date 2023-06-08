@@ -8,16 +8,22 @@
 
 #Write something here to describe my script
 
-#Top of the script variables, I am storing the current USER on the system into
-#a variable called my_username for future use. I also am storing the current date
-#with a few options such as %A which will give me the full weekday name.
+#I am storing the current USER on the system into a variable called my_username for future use.
 
 username=$USER
+
+#I am storing the current date with a few options such as %A which will give me the full weekday name.
+
 date=$(date +"%A, %B %d, %Y %T")
 
+#I store the system variable $(hostname) into my own variable called hostname
 
 hostname=$(hostname)
+
+#I created a source so that I can easily access the variable label names inside this path such as the operating System name/version
 source /etc/os-release
+
+#I store the uptime -p command into variable called uptime. Using the -p option will display the uptime in human readable format
 uptime=$(uptime -p)
 
 cpu=$(lshw -class processor | grep "product:" | awk -F "product: " '{print $2}' | sort -u)
@@ -41,6 +47,8 @@ free_disk_space=$(df -h | awk '{print $1, $4}' | column -t)
 number_of_processes=$(ps -e --no-header | wc -l)
 load_averages=$(uptime | grep "load average: " | awk '{print $8, $9, $10}')
 memory_allocation=$(free -h -t)
+listening_network_ports=$(ss -l -n -t)
+firewall_rules=$(ufw status verbose)
 
 cat << EOF
 
@@ -54,7 +62,7 @@ of the current machine.
 
 Some of the Commands inside this Script 
 Require Permissions. This script should be run with 
-sudo to ensure complete command output 
+sudo to ensure complete command output. 
 
 ====================================================
 
@@ -69,7 +77,7 @@ System Information:
 
 The Current Hostname: $hostname
 
-OS: $NAME $VERSION
+Operating System: $NAME $VERSION
 
 System Uptime: $uptime
 
@@ -123,5 +131,13 @@ Load Averages (1 Min, 5 Min, 15 Min): $load_averages
 Memory Allocation: 
 
 $memory_allocation
+
+Listening Network Ports:
+
+$listening_network_ports
+
+Firewall Rules:
+
+$firewall_rules
 
 EOF

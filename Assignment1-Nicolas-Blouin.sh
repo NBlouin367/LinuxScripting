@@ -12,19 +12,26 @@
 #a variable called my_username for future use. I also am storing the current date
 #with a few options such as %A which will give me the full weekday name.
 sudo
-my_username=$USER
-my_date=$(date +"%A, %B %d, %Y %T")
+username=$USER
+date=$(date +"%A, %B %d, %Y %T")
 
 
-my_hostname=$(hostname)
+hostname=$(hostname)
 source /etc/os-release
-my_uptime=$(uptime -p)
+uptime=$(uptime -p)
 
-my_cpu=$(lshw -class processor | grep "product" | awk -F "product: " '{print $2}' | sort -u)
-my_current_cpu_mhz=$(lscpu | grep "MHz" | awk '{print $3}')
-my_maximum_cpu_mhz=$(lscpu | grep "CPU max MHz" | awk '{print $4}')
-my_ram=$(free -h | grep "Mem: " | awk '{print $2}')
-my_disks=$(lsblk -o NAME,MODEL,SIZE | grep -v "loop")
+cpu=$(lshw -class processor | grep "product:" | awk -F "product: " '{print $2}' | sort -u)
+current_cpu_mhz=$(lscpu | grep "MHz" | awk '{print $3}')
+maximum_cpu_mhz=$(lscpu | grep "CPU max MHz" | awk '{print $4}')
+ram=$(free -h | grep "Mem: " | awk '{print $2}')
+disks=$(lsblk -o NAME,MODEL,SIZE | grep -v "loop")
+videocard=$(lspci | grep -E "VGA|3D"| awk -F ": " '{print $2}' | sort -u)
+
+fqdn=$(hostname -f)
+host_ip_address=$(hostname -I | awk '{print $1}')
+default_gateway=$(ip r | grep "default via" | awk '{print $3}')
+dns_server=$(cat /etc/resolv.conf | grep "nameserver" | awk '{print $2}')
+
 
 cat << EOF
 
@@ -35,6 +42,10 @@ Script Description:
 This script will create a system information report
 including system hardware, network, and system status
 of the current machine.
+
+Some of the Commands inside this Script 
+Require Permissions. This script should be run with 
+sudo to ensure complete command output 
 
 ====================================================
 
@@ -59,6 +70,33 @@ Hardware Information:
 ---------------------
 
 CPU: $cpu
-Current CPU Speed (MHz): $current_cpu_mhz 
+
+Current CPU Speed (MHz): $current_cpu_mhz
+
+Maximum CPU Speed (MHz): $maximum_cpu_mhz
+
+Total Memory (RAM): $ram
+
+Installed Storage Disks:
+
+$disks
+
+Video Card: $videocard
+
+====================================================
+
+Network Information:
+--------------------
+
+FQDN: $fqdn
+
+Host IP Address: $host_ip_address
+
+Default Gateway: $default_gateway
+
+DNS Server: $dns_server
+
+====================================================
+
 
 EOF

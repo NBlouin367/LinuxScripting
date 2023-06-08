@@ -1,12 +1,13 @@
 #!/bin/bash
 
 #Assignment 1: System Report
-#Name:  Nicolas Blouin
+#Name: Nicolas Blouin
 #Student Number: 200410446
 
-#Script Description
-
-#Write something here to describe my script!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#Script Description:
+#This script works by taking the filtered output of commands
+#and storing them into variables, I then use the variables throughout my script
+#to display information about the system the script is being ran on. 
 
 #I am storing the current USER on the system into
 #a variable called my_username for future use.
@@ -36,20 +37,19 @@ uptime=$(uptime -p)
 #I created a cpu variable and store a lshw command into it. 
 #I used -class processor options to filter the data of the lshw command
 #followed by piping the output into grep and looking for product
-#once product was found, I used awk -F to specify my delimeter area.
+#once product was found, I used awk -F to specify my separation area.
 #once I had my reference point I used print $2 to get the 2nd field of data from that 
 #area, I then sorted using -u to find unique items and no duplicates.
 
 cpu=$(lshw -class processor | grep "product:" | awk -F "product: " '{print $2}' | sort -u)
 
-#Using the lscpu command I took the output and piped into grep to find
-#Mhz
+#
 
-current_cpu_mhz=$(lscpu | grep "MHz" | awk '{print $3}')
+current_cpu_mhz=$()
 
 #
 
-maximum_cpu_mhz=$(lscpu | grep "CPU max MHz" | awk '{print $4}')
+maximum_cpu_mhz=$()
 
 #Storing a command into variable called ram. I used the free command 
 #to gather information on the vailable RAM within the system. 

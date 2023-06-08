@@ -21,7 +21,11 @@ source /etc/os-release
 uptime=$(uptime -p)
 
 cpu=$(lshw -class processor | grep "product:" | awk -F "product: " '{print $2}' | sort -u)
+
+#
+
 current_cpu_mhz=$(lscpu | grep "MHz" | awk '{print $3}')
+#
 maximum_cpu_mhz=$(lscpu | grep "CPU max MHz" | awk '{print $4}')
 ram=$(free -h | grep "Mem: " | awk '{print $2}')
 disks=$(lsblk -o NAME,MODEL,SIZE | grep -v "loop")

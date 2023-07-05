@@ -5,6 +5,7 @@
 #Student ID: 200410446
 #Course Code: COMP2137
 
+#Description
 if [[ $(hostname) != "autosrv" ]]; then
     echo "Updating the hostname"
     echo "autosrv" > /etc/hostname

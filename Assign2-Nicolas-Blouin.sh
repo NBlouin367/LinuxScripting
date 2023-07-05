@@ -23,6 +23,40 @@ else
     echo "Hostname is already set correctly"
 fi
 
+dpkg -s openssh-server 
+if [ $? -ne 0 ]; then
+    echo "Installing SSH server..."
+    sudo apt install -y openssh-server
+    # Configure SSH server
+    sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+    sudo sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+    sudo systemctl restart sshd
+else
+    echo "SSH server is already installed."
+fi
+
+dpkg -s apache2 &> /dev/null
+if [ $? -ne 0 ]; then
+    echo "Installing Apache2 web server..."
+    sudo apt install -y apache2
+    # Configure Apache2
+    sudo a2enmod ssl
+    sudo systemctl restart apache2
+else
+    echo "Apache2 web server is already installed."
+fi
+
+dpkg -s squid &> /dev/null
+if [ $? -ne 0 ]; then
+    echo "Installing Squid web proxy..."
+    sudo apt install -y squid
+    # Configure Squid
+    sudo sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf
+    sudo systemctl restart squid
+else
+    echo "Squid web proxy is already installed."
+fi
+
 
 interface_name=$(ip route | awk '/default/ {print $5}')
 

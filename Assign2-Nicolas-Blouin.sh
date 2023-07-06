@@ -23,7 +23,7 @@ else
     echo "Hostname is already set correctly."
 fi
 
-dpkg -s openssh-server &> /dev/null
+dpkg -s openssh-server > /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing SSH server..."
     sudo apt-get install -y openssh-server > /dev/null
@@ -80,7 +80,7 @@ else
     fi
 fi
 
-dpkg -s apache2 &> /dev/null
+dpkg -s apache2 > /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing Apache2 web server..."
     sudo apt-get install -y apache2 > /dev/null
@@ -121,7 +121,7 @@ else
 
 fi
 
-dpkg -s squid &> /dev/null
+dpkg -s squid > /dev/null
 if [ $? -ne 0 ]; then
 
     echo "Installing Squid web proxy..."
@@ -201,7 +201,7 @@ users=("dennis" "aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perri
 
 for user in "${users[@]}"; do
     # Check if user already exists
-    if id -u "$user" >/dev/null 2>&1; then
+    if id -u "$user" > /dev/null; then
         echo "User '$user' already exists. Checking Next User."
 
     else
@@ -247,7 +247,7 @@ for user in "${users[@]}"; do
 done
 
 for user in "${users[@]}"; do
-    if [ "$user" = "dennis" ] && id -u "$user" > /dev/null 2>&1; then
+    if [ "$user" = "dennis" ] && id -u "$user" > /dev/null; then
         
         sudo usermod -aG sudo dennis
 

@@ -26,7 +26,7 @@ fi
 dpkg -s openssh-server &> /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing SSH server..."
-    sudo apt install -y openssh-server > /dev/null
+    sudo apt-get install -y openssh-server > /dev/null
     if [ $? -eq 0 ]; then
         echo "openssh install complete."
     fi
@@ -46,7 +46,7 @@ fi
 dpkg -s apache2 &> /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing Apache2 web server..."
-    sudo apt install -y apache2 > /dev/null
+    sudo apt-get install -y apache2 > /dev/null
 
     if [ $? -eq 0 ]; then
         echo "Installed Apache2."
@@ -73,7 +73,7 @@ fi
 dpkg -s squid &> /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing Squid web proxy..."
-    sudo apt install -y squid > /dev/null
+    sudo apt-get install -y squid > /dev/null
     # Configure Squid
     sudo sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf
     echo "restarting Squid service."

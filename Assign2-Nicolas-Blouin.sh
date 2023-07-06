@@ -32,8 +32,22 @@ if [ $? -ne 0 ]; then
     fi
 
     # Configure SSH server
+    echo "Configuring SSH settings."
+
+    echo "Setting password authentication to NO"
     sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+
+    if [ $? -eq 0 ]; then
+        echo "Password authentication settings applied."
+    fi
+
+    echo "Setting SSH key authentication to YES"
     sudo sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+    if [ $? -eq 0 ]; then
+        echo "SSH Key authentication settings set successfully."
+    fi
+
+
     echo "Restarting SSH."
     sudo systemctl restart sshd
     if [ $? -eq 0 ]; then
@@ -41,10 +55,24 @@ if [ $? -ne 0 ]; then
     fi
 else
     echo "SSH server is already installed."
-    echo "Going to apply this scripts config for SSH"
+    echo "Going to apply this scripts config settings for SSH"
+
     # Configure SSH server
+    echo "Setting password authentication to NO"
     sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+
+    if [ $? -eq 0 ]; then
+        echo "Password authentication set correctly."
+    fi
+
+    echo "Setting SSH key authentication to YES"
     sudo sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+
+    if [ $? -eq 0 ]; then
+        echo "SSH key authentication set correctly."
+    fi
+
+
     echo "Restarting services."
     sudo systemctl restart sshd
     if [ $? -eq 0 ]; then
@@ -62,11 +90,12 @@ if [ $? -ne 0 ]; then
     fi
 
     # Configure Apache2
+    echo "Setting config for Apache2."
 
-    sudo a2enmod ssl
+    sudo a2enmod ssl > /dev/null
 
     if [ $? -eq 0 ]; then
-        echo "a2enmod success."
+        echo "config enabled successfully."
     fi
 
     echo "Restarting Apache2 to complete setup."
@@ -78,10 +107,10 @@ if [ $? -ne 0 ]; then
 else
     echo "Apache2 web server is already installed."
     echo "Will apply settings to apache from this script."
-    sudo a2enmod ssl
+    sudo a2enmod ssl > /dev/null
 
     if [ $? -eq 0 ]; then
-        echo "a2enmod success."
+        echo "Apache Settings Applied Successfully."
     fi
 
     echo "Restarting Apache2 to complete setup."
@@ -94,10 +123,21 @@ fi
 
 dpkg -s squid &> /dev/null
 if [ $? -ne 0 ]; then
+
     echo "Installing Squid web proxy..."
     sudo apt-get install -y squid > /dev/null
+    if [ $? -eq 0 ]; then
+        echo "Squid installed."
+    fi
+
     # Configure Squid
+    echo "Setting script config to squid settings."
     sudo sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf
+
+    if [ $? -eq 0 ]; then
+        echo "Squid settings applied."
+    fi
+
     echo "restarting Squid."
     sudo systemctl restart squid
     if [ $? -eq 0 ]; then
@@ -108,6 +148,11 @@ else
     echo "Setting configuration of this script to squid."
     # Configure Squid
     sudo sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf
+
+    if [ $? -eq 0 ]; then
+        echo "Squid was setup correctly."
+    fi
+
     echo "restarting Squid service."
     sudo systemctl restart squid
     if [ $? -eq 0 ]; then

@@ -20,7 +20,7 @@ if [[ $(hostname) != "autosrv" ]]; then
     fi
 
 else
-    echo "Hostname is already set correctly"
+    echo "Hostname is already set correctly."
 fi
 
 dpkg -s openssh-server &> /dev/null
@@ -34,7 +34,7 @@ if [ $? -ne 0 ]; then
     # Configure SSH server
     sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
     sudo sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
-    echo "Restarting services."
+    echo "Restarting SSH."
     sudo systemctl restart sshd
     if [ $? -eq 0 ]; then
         echo "SSH Setup complete.."
@@ -49,7 +49,7 @@ else
     sudo systemctl restart sshd
     if [ $? -eq 0 ]; then
         echo "SSH setup Complete."
-
+    fi
 fi
 
 dpkg -s apache2 &> /dev/null
@@ -98,10 +98,10 @@ if [ $? -ne 0 ]; then
     sudo apt-get install -y squid > /dev/null
     # Configure Squid
     sudo sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf
-    echo "restarting Squid service."
+    echo "restarting Squid."
     sudo systemctl restart squid
     if [ $? -eq 0 ]; then
-        echo "Squid setup Complete."
+        echo "Squid setup complete."
     fi
 else
     echo "Squid web proxy is already installed."
@@ -111,7 +111,7 @@ else
     echo "restarting Squid service."
     sudo systemctl restart squid
     if [ $? -eq 0 ]; then
-        echo "Squid setup Complete."
+        echo "Squid setup complete."
     fi
 
 fi

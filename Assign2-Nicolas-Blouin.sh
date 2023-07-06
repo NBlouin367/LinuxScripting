@@ -26,11 +26,15 @@ fi
 dpkg -s openssh-server &> /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing SSH server..."
-    sudo apt install -y openssh-server
+    sudo apt install -y openssh-server > /dev/null
     # Configure SSH server
     sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
     sudo sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+    echo "Restarting services."
     sudo systemctl restart sshd
+    if [ $? -eq 0 ]; then
+        echo "SSH setup Complete."
+    fi
 else
     echo "SSH server is already installed."
 fi
@@ -38,10 +42,15 @@ fi
 dpkg -s apache2 &> /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing Apache2 web server..."
-    sudo apt install -y apache2
+    sudo apt install -y apache2 > dev/null
     # Configure Apache2
     sudo a2enmod ssl
+    echo "Restarting Apache2 to complete setup."
     sudo systemctl restart apache2
+    if [ $? -eq 0 ]; then
+        echo "Apache setup Complete."
+    fi
+
 else
     echo "Apache2 web server is already installed."
 fi
@@ -49,10 +58,14 @@ fi
 dpkg -s squid &> /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing Squid web proxy..."
-    sudo apt install -y squid
+    sudo apt install -y squid > /dev/null
     # Configure Squid
-    sudo sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf
+    sudo sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf > /dev/null
+    echo "restarting Squid service."
     sudo systemctl restart squid
+    if [ $? -eq 0 ]; then
+        echo "Squid setup Complete."
+    fi
 else
     echo "Squid web proxy is already installed."
 fi
@@ -60,14 +73,17 @@ fi
 dpkg -s makepasswd &> /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing my password generator for later..."
-    sudo apt install -y makepasswd
+    sudo apt install -y makepasswd > /dev/null
+    if [ $? -eq 0 ]; then
+        echo "Password Generator Installed."
+    fi
 fi
 
 
 if [[ $(ufw status | grep -w "Status: active") ]]; then
   echo "UFW firewall is already enabled."
   #Will add rules anyways even if the firewall is active
-  echo "Adding rules"
+  echo "Adding rules."
  
   ufw allow 22
 
@@ -101,7 +117,7 @@ fi
 
 users=("dennis" "aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
 
-for user in "${users[@]}"; do
+for user in $users; do
     # Check if user already exists
     if id -u "$user" >/dev/null 2>&1; then
         echo "User '$user' already exists. Skipping..."
@@ -149,7 +165,7 @@ for user in "${users[@]}"; do
 done
 
 for user in $users; do
-    if [ "$user" = "dennis" ] && id -u "$user" >/dev/null 2>&1; then
+    if [ "$user" = "dennis" ] && id -u "$user" > /dev/null 2>&1; then
         
         sudo usermod -aG sudo dennis
 
@@ -168,9 +184,6 @@ for user in $users; do
             sudo -u "$user" ssh-keygen -t ed25519 -f "/home/$user/.ssh/id_ed25519" -q -N ""
         fi
 
-        sudo -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
-        sudo -u "$user" ssh-keygen -t ed25519 -f "/home/$user/.ssh/id_ed25519" -q -N ""
-
         # Add the generated public keys to authorized_keys file
         cat "/home/$user/.ssh/id_rsa.pub" >> "/home/$user/.ssh/authorized_keys"
         cat "/home/$user/.ssh/id_ed25519.pub" >> "/home/$user/.ssh/authorized_keys"
@@ -179,3 +192,29 @@ for user in $users; do
     fi
 done
 
+interface_name=$(ip route | awk '/default/ {print $5}')
+
+config="
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    $interface_name:
+      addresses: [192.168.16.21/24]
+      routes: 
+        - to: 0.0.0.0/0
+          via: 192.168.16.1
+      nameservers:
+        addresses: [192.168.16.1]
+        search: [home.arpa, localdomain]
+"
+
+new_netplan="/etc/netplan/new_netplan_config.yaml"
+
+echo "$config" | sudo tee "$new_netplan" > /dev/null
+
+sudo netplan apply &> /dev/null
+
+if [ $? -eq 0 ]; then
+    echo "Netplan configuration was applied!"
+fi

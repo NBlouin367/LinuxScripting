@@ -177,11 +177,17 @@ for user in "${users[@]}"; do
         # Generate ssh keys for rsa if it dosn't exist for the user. 
         if [ ! -f "/home/$user/.ssh/id_rsa" ]; then
             sudo -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
+            if [ $? -eq 0 ]; then
+                echo "Made RSA key for Dennis"
+            fi
         fi
 
         #generate ssh keys using ed25519 if it doesn't exist for the user
         if [ ! -f "/home/$user/.ssh/id_ed25519" ]; then
             sudo -u "$user" ssh-keygen -t ed25519 -f "/home/$user/.ssh/id_ed25519" -q -N ""
+            if [ $? -eq 0 ]; then
+                echo "Made ed25519 key for Dennis"
+            fi
         fi
 
         # Add the generated public keys to authorized_keys file
@@ -189,6 +195,10 @@ for user in "${users[@]}"; do
         cat "/home/$user/.ssh/id_ed25519.pub" >> "/home/$user/.ssh/authorized_keys"
         #Give the key to dennis and append it to the file authorized_keys using the file path /home/dennis/.ssh/authorized_keys
         echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLnKfP0GSqbWSGYW/nC7UFLpfmgZTLUVlE2q1+jOHvDlUz+y0iCGdz+1WzILJeckv9EPaW1bVRLRuk1YQD9K7dGpXdRDM6Vt2g/EaQK+d+9L3aUhQj+6B3JlRGq+Yh0g/k0KvFCahUMyGNu47Vc6rHuKwM30be3Vi8biW1w/Sy2gGYevwM1byN3RkMDTy9LaLVf6OH9x/NM//xLJL5s6GjIKivAa3KBq63/3ZQZll3BlYp8bfwIFsKrBlLYW62UyrNG/ZiyL66XW6KlANMFg5/CQ3IvH/U9pQhStYP3p7PEKK5T4FS2trgsfU6JZxasufuK41UrYCDZ1FdMf user@example.com" >> "/home/dennis/.ssh/authorized_keys"
+        if [ $? -eq 0 ]; then
+            echo "Added Key to Dennis' key folder!"
+        fi
+
     fi
 done
 

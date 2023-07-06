@@ -26,14 +26,18 @@ fi
 dpkg -s openssh-server &> /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing SSH server..."
-    sudo apt install -y openssh-server
+    sudo apt install -y openssh-server > /dev/null
+    if [ $? -eq 0 ]; then
+        echo "openssh install complete."
+    fi
+
     # Configure SSH server
     sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
     sudo sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
     echo "Restarting services."
     sudo systemctl restart sshd
     if [ $? -eq 0 ]; then
-        echo "SSH setup Complete."
+        echo "SSH restart complete."
     fi
 else
     echo "SSH server is already installed."
@@ -42,13 +46,24 @@ fi
 dpkg -s apache2 &> /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing Apache2 web server..."
-    sudo apt install -y apache2
+    sudo apt install -y apache2 > /dev/null
+
+    if [ $? -eq 0 ]; then
+        echo "Installed Apache2."
+    fi
+
     # Configure Apache2
+
     sudo a2enmod ssl
+
+    if [ $? -eq 0 ]; then
+        echo "a2enmod success."
+    fi
+
     echo "Restarting Apache2 to complete setup."
     sudo systemctl restart apache2
     if [ $? -eq 0 ]; then
-        echo "Apache setup Complete."
+        echo "Apache setup complete."
     fi
 
 else
@@ -58,7 +73,7 @@ fi
 dpkg -s squid &> /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing Squid web proxy..."
-    sudo apt install -y squid
+    sudo apt install -y squid > /dev/null
     # Configure Squid
     sudo sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf
     echo "restarting Squid service."
@@ -68,15 +83,6 @@ if [ $? -ne 0 ]; then
     fi
 else
     echo "Squid web proxy is already installed."
-fi
-
-dpkg -s makepasswd &> /dev/null
-if [ $? -ne 0 ]; then
-    echo "Installing my password generator for later..."
-    sudo apt install -y makepasswd
-    if [ $? -eq 0 ]; then
-        echo "Password Generator Installed."
-    fi
 fi
 
 
@@ -127,8 +133,8 @@ for user in "${users[@]}"; do
         sudo useradd -m -s /bin/bash "$user"
         echo "adding user $user..."
 
-        # Generate random password using mkpasswd
-        password=$(makepasswd)
+        # Generate random password using the built in automated password genrator built into the linux operating system
+        password=$(apg -n 1 -m 10)
 
         # Set the generated password for the user
         echo "$user:$password" | sudo chpasswd

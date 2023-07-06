@@ -26,7 +26,7 @@ fi
 dpkg -s openssh-server &> /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing SSH server..."
-    sudo apt install -y openssh-server > /dev/null
+    sudo apt install -y openssh-server
     # Configure SSH server
     sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
     sudo sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
@@ -42,7 +42,7 @@ fi
 dpkg -s apache2 &> /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing Apache2 web server..."
-    sudo apt install -y apache2 > dev/null
+    sudo apt install -y apache2
     # Configure Apache2
     sudo a2enmod ssl
     echo "Restarting Apache2 to complete setup."
@@ -58,9 +58,9 @@ fi
 dpkg -s squid &> /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing Squid web proxy..."
-    sudo apt install -y squid > /dev/null
+    sudo apt install -y squid
     # Configure Squid
-    sudo sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf > /dev/null
+    sudo sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf
     echo "restarting Squid service."
     sudo systemctl restart squid
     if [ $? -eq 0 ]; then
@@ -73,7 +73,7 @@ fi
 dpkg -s makepasswd &> /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing my password generator for later..."
-    sudo apt install -y makepasswd > /dev/null
+    sudo apt install -y makepasswd
     if [ $? -eq 0 ]; then
         echo "Password Generator Installed."
     fi
@@ -120,7 +120,7 @@ users=("dennis" "aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perri
 for user in $users; do
     # Check if user already exists
     if id -u "$user" >/dev/null 2>&1; then
-        echo "User '$user' already exists. Skipping..."
+        echo "User '$user' already exists. Checking Next User."
 
     else
         # Create user with home directory and bash shell

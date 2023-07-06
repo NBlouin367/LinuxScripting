@@ -23,7 +23,7 @@ else
     echo "Hostname is already set correctly"
 fi
 
-dpkg -s openssh-server 
+dpkg -s openssh-server &> /dev/null
 if [ $? -ne 0 ]; then
     echo "Installing SSH server..."
     sudo apt install -y openssh-server
@@ -58,29 +58,38 @@ else
 fi
 
 
-interface_name=$(ip route | awk '/default/ {print $5}')
+if [[ $(ufw status | grep -w "Status: active") ]]; then
+  echo "UFW firewall is already enabled."
+  #Will add rules anyways even if the firewall is active
+  echo "Adding rules"
+ 
+  ufw allow 22
 
-config="
-network:
-  version: 2
-  renderer: networkd
-  ethernets:
-    $interface_name:
-      addresses: [192.168.16.21/24]
-      routes: 
-        - to: 0.0.0.0/0
-          via: 192.168.16.1
-      nameservers:
-        addresses: [192.168.16.1]
-        search: [home.arpa, localdomain]"
+  ufw allow 80
 
-new_netplan="/etc/netplan/new_netplan_config.yaml"
+  ufw allow 443
 
-echo "$config" | sudo tee "$new_netplan" > /dev/null
+  ufw allow 3128
 
-sudo netplan apply
+  ufw reload
 
-if [ $? -eq 0 ]; then
-    echo "Netplan configuration was applied!"
+#when the firewall is not on run the else and enable it and apply rules to allow my listed ports
+else
+
+  echo "Enabling UFW firewall..."
+
+  ufw enable
+
+  ufw allow 22
+
+  ufw allow 80
+
+  ufw allow 443
+
+  ufw allow 3128
+
+  ufw reload
+
+  echo "Firewall turned on and setup was successful!"
 fi
 

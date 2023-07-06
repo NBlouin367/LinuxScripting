@@ -37,10 +37,19 @@ if [ $? -ne 0 ]; then
     echo "Restarting services."
     sudo systemctl restart sshd
     if [ $? -eq 0 ]; then
-        echo "SSH restart complete."
+        echo "SSH Setup complete.."
     fi
 else
     echo "SSH server is already installed."
+    echo "Going to apply this scripts config for SSH"
+    # Configure SSH server
+    sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+    sudo sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+    echo "Restarting services."
+    sudo systemctl restart sshd
+    if [ $? -eq 0 ]; then
+        echo "SSH setup Complete."
+
 fi
 
 dpkg -s apache2 &> /dev/null
@@ -68,6 +77,19 @@ if [ $? -ne 0 ]; then
 
 else
     echo "Apache2 web server is already installed."
+    echo "Will apply settings to apache from this script."
+    sudo a2enmod ssl
+
+    if [ $? -eq 0 ]; then
+        echo "a2enmod success."
+    fi
+
+    echo "Restarting Apache2 to complete setup."
+    sudo systemctl restart apache2
+    if [ $? -eq 0 ]; then
+        echo "Apache setup complete."
+    fi
+
 fi
 
 dpkg -s squid &> /dev/null
@@ -83,6 +105,15 @@ if [ $? -ne 0 ]; then
     fi
 else
     echo "Squid web proxy is already installed."
+    echo "Setting configuration of this script to squid."
+    # Configure Squid
+    sudo sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf
+    echo "restarting Squid service."
+    sudo systemctl restart squid
+    if [ $? -eq 0 ]; then
+        echo "Squid setup Complete."
+    fi
+
 fi
 
 

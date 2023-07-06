@@ -117,7 +117,7 @@ fi
 
 users=("dennis" "aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
 
-for user in $users; do
+for user in "${users[@]}"; do
     # Check if user already exists
     if id -u "$user" >/dev/null 2>&1; then
         echo "User '$user' already exists. Checking Next User."
@@ -164,7 +164,7 @@ for user in $users; do
     fi
 done
 
-for user in $users; do
+for user in "${users[@]}"; do
     if [ "$user" = "dennis" ] && id -u "$user" > /dev/null 2>&1; then
         
         sudo usermod -aG sudo dennis

@@ -73,7 +73,7 @@ else
     fi
 
 
-    echo "Restarting services."
+    echo "Restarting SSH."
     sudo systemctl restart sshd
     if [ $? -eq 0 ]; then
         echo "SSH setup Complete."
@@ -110,7 +110,7 @@ else
     sudo a2enmod ssl > /dev/null
 
     if [ $? -eq 0 ]; then
-        echo "Apache Settings Applied Successfully."
+        echo "Apache settings applied successfully."
     fi
 
     echo "Restarting Apache2 to complete setup."
@@ -153,7 +153,7 @@ else
         echo "Squid was setup correctly."
     fi
 
-    echo "restarting Squid service."
+    echo "Restarting Squid service."
     sudo systemctl restart squid
     if [ $? -eq 0 ]; then
         echo "Squid setup complete."

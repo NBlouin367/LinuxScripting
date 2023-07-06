@@ -57,6 +57,12 @@ else
     echo "Squid web proxy is already installed."
 fi
 
+dpkg -s makepasswd &> /dev/null
+if [ $? -ne 0 ]; then
+    echo "Installing my password generator for later..."
+    sudo apt install -y makepasswd
+fi
+
 
 if [[ $(ufw status | grep -w "Status: active") ]]; then
   echo "UFW firewall is already enabled."
@@ -95,7 +101,7 @@ fi
 
 users=("dennis" "aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
 
-for user in $users; do
+for user in "${users[@]}"; do
     # Check if user already exists
     if id -u "$user" >/dev/null 2>&1; then
         echo "User '$user' already exists. Skipping..."
@@ -103,9 +109,10 @@ for user in $users; do
     else
         # Create user with home directory and bash shell
         sudo useradd -m -s /bin/bash "$user"
+        echo "adding user $user..."
 
         # Generate random password using mkpasswd
-        password=$(mkpasswd -l 12)
+        password=$(makepasswd)
 
         # Set the generated password for the user
         echo "$user:$password" | sudo chpasswd

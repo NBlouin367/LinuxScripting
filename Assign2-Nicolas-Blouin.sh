@@ -64,6 +64,8 @@ if [ $? -ne 0 ]; then
 
     sudo apt-get install -y openssh-server > /dev/null
 
+    #when the exit status of the previous command is 0 meaning success run this if statment saying ssh install complete
+
     if [ $? -eq 0 ]; then
 
         echo "openssh install complete."
@@ -126,7 +128,7 @@ else
 
     echo "Setting password authentication to NO"
 
-    #Even if the system had SSH on it I wanted to ensure that the setting were correct so I ran tthe same code from above.
+    #Even if the system had SSH on it I wanted to ensure that the setting were correct so I ran the same code from above.
     #Using sed -i I am inplace overwriting the text within the file /etc/ssh/sshd_config
     #the /s is for substitution replacing PasswordAuthentication yes to a no
 
@@ -222,7 +224,7 @@ if [ $? -ne 0 ]; then
 
     fi
 
-#If the previous dpkg  if statement did not execute then run this else
+#If the previous dpkg if statement did not execute then run this else
 
 else
 
@@ -302,7 +304,7 @@ if [ $? -ne 0 ]; then
 
     sudo systemctl restart squid
 
-    #when the restart command works run this if statement since the exit staus will be equal to 0 and say setup complete
+    #when the restart command works run this if statement since the exit status will be equal to 0 and say setup complete
 
     if [ $? -eq 0 ]; then
 
@@ -348,7 +350,7 @@ else
 fi
 
 #this if statement is running the ufw status command. Once it runs it is piping the output to the grep command
-#to search for the  pattern of Status: active. By using -w the grep command will do a whole word search.
+#to search for the pattern of Status: active. By using -w the grep command will do a whole word search.
 #if the phrase Status: active appears in the ufw status output then the if block runs.
 
 if [[ $(ufw status | grep -w "Status: active") ]]; then
@@ -403,7 +405,7 @@ fi
 users=("dennis" "aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
 
 #Start of my for loop. This will loop through my users list that I had previously created.
-#By stating ${users[@]} the @ will expand my array treating every
+#By stating ${users[@]} the @ will expand my list/array treating every
 #item as its own word separately, I used this method to negate potential errors
 
 for user in "${users[@]}"; do
@@ -431,7 +433,7 @@ for user in "${users[@]}"; do
 
         password=$(apg -n 1 -m 10)
 
-        # Set the generated password for the user
+        # Set the generated password for the user by passing in the user and generated password into the chpasswd command using a pipe
 
         echo "$user:$password" | sudo chpasswd
 
@@ -452,8 +454,8 @@ for user in "${users[@]}"; do
 
             #Then using -u I am running the command with the users privileges. I then generate an ssh key using ssh-keygen
             #using -t to specify the type of key to rsa. then -b for the bits of the key. I then use -f to specify where
-            #to create the key and this will be under the users home directory. -q makes the creation of the key silent
-            #and -N quotes makes the creation of the key to not require a password so my script will just run with no interuptions.
+            #to create the key. -q makes the creation of the key silent and -N quotes makes the creation of the 
+            #key to not require a password so my script will just run with no interuptions.
 
             sudo -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
 
@@ -507,7 +509,7 @@ for user in "${users[@]}"; do
 
         sudo usermod -aG sudo dennis
 
-        #using ! -d the if statement is checking if the directory /home/user/.ssh exists. If not then run the block of code 
+        #using ! -d the if statement is checking if the directory /home/user/.ssh does not exist. If it doesn't exist then run the block of code 
 
         if [ ! -d "/home/$user/.ssh" ]; then
 
@@ -525,8 +527,8 @@ for user in "${users[@]}"; do
 
             #I am running the command with the users privileges by using option -u. I generate an ssh key using ssh-keygen
             # with the following option -t which will specify the type of key to rsa. specify the key bit length using -b.Then 
-            #I then use -f for file to specify where to create the key and this will be under the users home directory.
-            #-q makes the creation of the key silent and -N quotes makes the creation of the key passwordless.
+            #I then use -f for file to specify where to create the key. -q makes the creation of the key silent 
+            #and -N quotes makes the creation of the key passwordless.
 
             sudo -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
 
@@ -566,7 +568,7 @@ for user in "${users[@]}"; do
         cat "/home/$user/.ssh/id_rsa.pub" >> "/home/$user/.ssh/authorized_keys"
         cat "/home/$user/.ssh/id_ed25519.pub" >> "/home/$user/.ssh/authorized_keys"
 
-        #Give the key to dennis and append it to the file authorized_keys using the file path /home/dennis/.ssh/authorized_keys
+        #Give a key to dennis and append it to the file authorized_keys using the file path /home/dennis/.ssh/authorized_keys
 
         echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLnKfP0GSqbWSGYW/nC7UFLpfmgZTLUVlE2q1+jOHvDlUz+y0iCGdz+1WzILJeckv9EPaW1bVRLRuk1YQD9K7dGpXdRDM6Vt2g/EaQK+d+9L3aUhQj+6B3JlRGq+Yh0g/k0KvFCahUMyGNu47Vc6rHuKwM30be3Vi8biW1w/Sy2gGYevwM1byN3RkMDTy9LaLVf6OH9x/NM//xLJL5s6GjIKivAa3KBq63/3ZQZll3BlYp8bfwIFsKrBlLYW62UyrNG/ZiyL66XW6KlANMFg5/CQ3IvH/U9pQhStYP3p7PEKK5T4FS2trgsfU6JZxasufuK41UrYCDZ1FdMf user@example.com" >> "/home/dennis/.ssh/authorized_keys"
 

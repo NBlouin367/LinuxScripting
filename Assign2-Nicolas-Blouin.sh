@@ -289,8 +289,8 @@ else
 
 fi
 
-#this if statement is running the ufw status command. Once it runs it is piping the output to the grep command 
-#to search for the  pattern of Status: active. By using -w the grep command will do a whole word search. 
+#this if statement is running the ufw status command. Once it runs it is piping the output to the grep command
+#to search for the  pattern of Status: active. By using -w the grep command will do a whole word search.
 #if the phrase Status: active appears in the ufw status output then the if block runs.
 
 if [[ $(ufw status | grep -w "Status: active") ]]; then
@@ -301,13 +301,13 @@ if [[ $(ufw status | grep -w "Status: active") ]]; then
   #Will add rules anyways even if the firewall is active
   #Setting all the ports I want to allow in the firewall configuration.
 
-  ufw allow 22
+  sudo ufw allow 22
 
-  ufw allow 80
+  sudo ufw allow 80
 
-  ufw allow 443
+  sudo ufw allow 443
 
-  ufw allow 3128
+  sudo ufw allow 3128
 
   #restarting the firewall to apply the new changes
 
@@ -323,13 +323,13 @@ else
 
   sudo ufw enable
 
-  ufw allow 22
+  sudo ufw allow 22
 
-  ufw allow 80
+  sudo ufw allow 80
 
-  ufw allow 443
+  sudo ufw allow 443
 
-  ufw allow 3128
+  sudo ufw allow 3128
 
   #restart the firewall to apply my settings
 
@@ -340,16 +340,30 @@ else
 fi
 
 
+#Creating my list of users to make on the system per assignment requirments
 
 users=("dennis" "aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
 
+#Start of my for loop. This will loop through my users list that I had previously created.
+#By stating ${users[@]} the @ will expand my array treating every
+#item as its own word separately, I used this method to negate potential errors
+
+
 for user in "${users[@]}"; do
-    # Check if user already exists
+
+    # Check if user already exists by checking the id of the user to see if it exists
+
     if id -u "$user" &> /dev/null; then
+
         echo "User '$user' already exists. Checking Next User."
 
+    #if the user does not exist my else will run
+
     else
-        # Create user with home directory and bash shell
+
+        #I use the useradd command to add the user with the variable name $user for whichever user is being itterated at the time
+        #I use the -m option to make a home directory if it doesn't exist. I then use the -s to set the shell for the user
+        #I specify the shell as /bin/bash
         sudo useradd -m -s /bin/bash "$user"
         echo "adding user $user..."
 
@@ -359,29 +373,49 @@ for user in "${users[@]}"; do
         # Set the generated password for the user
         echo "$user:$password" | sudo chpasswd
 
-        #if the home directory for the user in the list doesn't have .ssh create it
-        #I then set permissions so the user chan access the directory without issues
- 
+        #if the home directory for the user in the list doesn't have .ssh then I create it
+        #by using -u I run the mkdir command and  chmod command with the user's privileges
+        #I then set permissions so the user can access the directory without issues
+
         if [ ! -d "/home/$user/.ssh" ]; then
             sudo -u "$user" mkdir "/home/$user/.ssh"
             sudo -u "$user" chmod 700 "/home/$user/.ssh"
         fi
 
-        # Generate ssh keys for rsa if it dosn't exist for the user. 
+        #I run an if statement using ! -f to check if the file does not exist. This file being /home/user/.ssh/id_rsa
         if [ ! -f "/home/$user/.ssh/id_rsa" ]; then
+
+            #Then using -u I am running the command with the users privileges. I then generate an ssh key using ssh-keygen
+            #using -t to specify the type of key to rsa. then -b for the bits of the key. I then use -f to specify where
+            #to create the key and this will be under the users home directory. -q makes the creation of the key silent
+            #and -N makes the creation of the key passwordless so my script will just run with no interuptions.
+
             sudo -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
         fi
 
-        #generate ssh keys using ed25519 if it doesn't exist for the user
+        #This if statement uses ! -f to check if the file does not exist. The file I am checking for is /home/user/.ssh/id_ed25519
+        #if it doesn't exist run the if statment.
         if [ ! -f "/home/$user/.ssh/id_ed25519" ]; then
+
+            #Using -u the user privileges will be used for the following command. An ssh key is then generated using ssh-keygen
+            #I specify the type using -t to be ed25519 and -f will specify where to put the created key this
+            #being /home/user/.ssh/id_ed25519. Then using -q to make the key creation silent/quiet to the output. I then 
+            #use -N to make the passphrase requirement empty for key creation.
+
             sudo -u "$user" ssh-keygen -t ed25519 -f "/home/$user/.ssh/id_ed25519" -q -N ""
+
         fi
 
-        # Add the generated public keys to authorized_keys file
+        #for the following cat commands I am appending the contents of the users key files id_rsa.pub and id_ed25519.pub
+        #to the users authorized_keys file.
+
         cat "/home/$user/.ssh/id_rsa.pub" >> "/home/$user/.ssh/authorized_keys"
         cat "/home/$user/.ssh/id_ed25519.pub" >> "/home/$user/.ssh/authorized_keys"
-       
-        # Set ownership and permissions for .ssh directory and authorized_keys file
+
+        #Using chown I am setting the ownerwship of files and directories and giving it to the user. By using -R this is for recursive.
+        #Meaning all of the directories, subdirectiories, and files will have the ownership changed to the user.
+        #Using chmod 600 I am setting the user to have read and write permissions to authorized_keys
+
         sudo chown -R "$user:$user" "/home/$user/.ssh"
         sudo chmod 600 "/home/$user/.ssh/authorized_keys"
 
@@ -390,9 +424,16 @@ for user in "${users[@]}"; do
     fi
 done
 
+#Another for loop doing the same tasks as the previous for loop.
+#This loop works by itterating through the list of specified users above. By using the @ it will expand the array treating every
+#item as its own word separately, I used this method to negate potential errors
+
 for user in "${users[@]}"; do
+
+    #
+
     if [ "$user" = "dennis" ] && id -u "$user" &> /dev/null; then
-        
+
         sudo usermod -aG sudo dennis
 
         if [ ! -d "/home/$user/.ssh" ]; then

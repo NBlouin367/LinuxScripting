@@ -197,7 +197,7 @@ else
   echo "Firewall turned on and setup was successful!"
 fi
 
-users=(dennis aubrey captain snibbles brownie scooter sandy perrier cindy tiger yoda)
+users=("dennis" "aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
 
 for user in "${users[@]}"; do
     # Check if user already exists

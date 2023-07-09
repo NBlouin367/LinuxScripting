@@ -97,30 +97,49 @@ if [ $? -ne 0 ]; then
 
 else
     echo "SSH server is already installed."
-    echo "Going to apply this scripts config settings for SSH"
+    echo "Going to apply this scripts config settings for SSH" 
 
-    # Configure SSH server
     echo "Setting password authentication to NO"
+
+    #Even if the system had SSH on it I wanted to ensure that the setting were correct so I ran tthe same code from above.
+    #Using sed -i I am inplace overwriting the text within the file /etc/ssh/sshd_config
+    #the /s is for substitution replacing PasswordAuthentication yes to a no 
+
     sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+
+    #if the sed command was successful then the if block runs saying set correctly
 
     if [ $? -eq 0 ]; then
         echo "Password authentication set correctly."
     fi
 
     echo "Setting SSH key authentication to YES"
+
+    #using sed I am replacing the text within my specified file /etc/ssh/sshd_config
+    #using the /s I am substituting the text to set the pubkeyAuthentication text from no to yes
+
     sudo sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+
+    #When the previous sed command works then I use an exit status check if statement to display some text saying it was set up
 
     if [ $? -eq 0 ]; then
         echo "SSH key authentication set correctly."
     fi
 
-
     echo "Restarting SSH."
+
+    #I then restart the SSH service to apply the changes correctly
+
     sudo systemctl restart sshd
+
+    #if the exit status was a 0 it succeded and I show some text to output saying setup complete
+
     if [ $? -eq 0 ]; then
         echo "SSH setup Complete."
     fi
 fi
+
+
 
 dpkg -s apache2 &> /dev/null
 if [ $? -ne 0 ]; then

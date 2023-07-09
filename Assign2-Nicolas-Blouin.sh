@@ -11,6 +11,7 @@
 #network settings, software installation, firewall altering, and lastly user accounts.
 #This script will change specific files within the system using sequences of commands and condition tests.
 
+echo "Even if you ran this script with sudo type it again to be sure."
 echo "Please Enter Your Sudo Password to run this script:"
 
 sudo -v
@@ -30,8 +31,8 @@ fi
 if [[ $(hostname) != "autosrv" ]]; then
 
     echo "Updating the hostname"
-    echo "autosrv" > /etc/hostname
-    hostnamectl set-hostname autosrv
+    sudo echo "autosrv" > /etc/hostname
+    sudo hostnamectl set-hostname autosrv
 
     #if the exit status is 0, the hostname change was successful then display it worked
 
@@ -61,7 +62,7 @@ fi
 #using dpkg -s I can check the status of the package I want in this case openssh-server
 #I then redirect unnecessary output to /dev/null.
 
-dpkg -s openssh-server &> /dev/null
+sudo dpkg -s openssh-server &> /dev/null
 
 #when the exit status of the previous dpkg status command is not equal to 0 then run the package installs
 #since it is not installed on the system.
@@ -185,7 +186,7 @@ fi
 #I use a dpkg -s to check the status of the apache2 package this will check if it is installed on the system
 #I then redirect to the null file to discard the output
 
-dpkg -s apache2 &> /dev/null
+sudo dpkg -s apache2 &> /dev/null
 
 #if the exit status of the dpkg command is not equal to 0 this means unsuccessful and it is not installed on the system
 #The if statement will then be executed to install it.
@@ -272,7 +273,7 @@ fi
 #using dpkg -s to check the staus of squid to see if it is installed or not. when the exit status is anything but a 0
 #the if statment will trigger which will install squid as it is not on the system.
 
-dpkg -s squid &> /dev/null
+sudo dpkg -s squid &> /dev/null
 
 #if the previous dpkg command is not equal to a 0 run this if statement since squid is not installed
 

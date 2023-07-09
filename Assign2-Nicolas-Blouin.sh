@@ -14,9 +14,9 @@ if [[ $(hostname) != "autosrv" ]]; then
     echo "Updating the hostname"
     echo "autosrv" > /etc/hostname
     hostnamectl set-hostname autosrv
-    
+
     #if the exit status is 0, the hostname change was successful then display it worked
-   
+
     if [ $? -eq 0 ]; then
        echo "Hostname has been changed!"
     fi
@@ -35,12 +35,12 @@ else
 fi
 
 #using dpkg -s I can check the status of the package I want in this case openssh-server
-#I then redirect unnecessary output to /dev/null. 
+#I then redirect unnecessary output to /dev/null.
 
 dpkg -s openssh-server &> /dev/null
 
 #when the exit status of the previous dpkg status command is not equal to 0 then run the package installs
-#since it is not installed on the system. 
+#since it is not installed on the system.
 
 if [ $? -ne 0 ]; then
     echo "Installing SSH server..."
@@ -96,13 +96,13 @@ if [ $? -ne 0 ]; then
 
 else
     echo "SSH server is already installed."
-    echo "Going to apply this scripts config settings for SSH" 
+    echo "Going to apply this scripts config settings for SSH"
 
     echo "Setting password authentication to NO"
 
     #Even if the system had SSH on it I wanted to ensure that the setting were correct so I ran tthe same code from above.
     #Using sed -i I am inplace overwriting the text within the file /etc/ssh/sshd_config
-    #the /s is for substitution replacing PasswordAuthentication yes to a no 
+    #the /s is for substitution replacing PasswordAuthentication yes to a no
 
     sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 
@@ -289,13 +289,18 @@ else
 
 fi
 
-
+#this if statement is running the ufw status command. Once it runs it is piping the output to the grep command 
+#to search for the  pattern of Status: active. By using -w the grep command will do a whole word search. 
+#if the phrase Status: active appears in the ufw status output then the if block runs.
 
 if [[ $(ufw status | grep -w "Status: active") ]]; then
+
   echo "UFW firewall is already enabled."
-  #Will add rules anyways even if the firewall is active
   echo "Adding rules."
- 
+
+  #Will add rules anyways even if the firewall is active
+  #Setting all the ports I want to allow in the firewall configuration.
+
   ufw allow 22
 
   ufw allow 80
@@ -304,14 +309,19 @@ if [[ $(ufw status | grep -w "Status: active") ]]; then
 
   ufw allow 3128
 
-  ufw reload
+  #restarting the firewall to apply the new changes
+
+  sudo ufw reload
 
 #when the firewall is not on run the else and enable it and apply rules to allow my listed ports
+
 else
 
   echo "Enabling UFW firewall..."
 
-  ufw enable
+  #turn on the firewall using ufw enable command
+
+  sudo ufw enable
 
   ufw allow 22
 
@@ -321,10 +331,15 @@ else
 
   ufw allow 3128
 
-  ufw reload
+  #restart the firewall to apply my settings
+
+  sudo ufw reload
 
   echo "Firewall turned on and setup was successful!"
+
 fi
+
+
 
 users=("dennis" "aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
 

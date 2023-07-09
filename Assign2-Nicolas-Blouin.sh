@@ -388,7 +388,7 @@ for user in "${users[@]}"; do
             #Then using -u I am running the command with the users privileges. I then generate an ssh key using ssh-keygen
             #using -t to specify the type of key to rsa. then -b for the bits of the key. I then use -f to specify where
             #to create the key and this will be under the users home directory. -q makes the creation of the key silent
-            #and -N makes the creation of the key passwordless so my script will just run with no interuptions.
+            #and -N quotes makes the creation of the key passwordless so my script will just run with no interuptions.
 
             sudo -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
         fi
@@ -400,7 +400,7 @@ for user in "${users[@]}"; do
             #Using -u the user privileges will be used for the following command. An ssh key is then generated using ssh-keygen
             #I specify the type using -t to be ed25519 and -f will specify where to put the created key this
             #being /home/user/.ssh/id_ed25519. Then using -q to make the key creation silent/quiet to the output. I then 
-            #use -N to make the passphrase requirement empty for key creation.
+            #use -N quotes to make the passphrase requirement empty for key creation.
 
             sudo -u "$user" ssh-keygen -t ed25519 -f "/home/$user/.ssh/id_ed25519" -q -N ""
 
@@ -430,44 +430,91 @@ done
 
 for user in "${users[@]}"; do
 
-    #
+    #this if statement is checking if the user being iterrated is equal to the string dennis
+    #As well as checkng if there is an id assosiated to dennis on the system. if dennis exists then the if statement executes.
 
     if [ "$user" = "dennis" ] && id -u "$user" &> /dev/null; then
 
+        #by using the usermod command with option -aG command I am adding dennis to the sudo group
+
         sudo usermod -aG sudo dennis
 
+        #using ! -d the if statement is checking if the directory /home/user/.ssh exists. If not then run the block of code 
+
         if [ ! -d "/home/$user/.ssh" ]; then
+
+            #creates a directory called /home/user/.ssh using the users privileges
+            #then chmod 700 will give read, write, and execute to the user for .ssh
+
             sudo -u "$user" mkdir "/home/$user/.ssh"
             sudo -u "$user" chmod 700 "/home/$user/.ssh"
+
         fi
 
-        # Generate ssh keys for rsa if it dosn't exist for the user. 
+        #Using ! -f the if statement is checking if the file /home/user/.ssh/id_rsa does not exist. Then run the block of code
+
         if [ ! -f "/home/$user/.ssh/id_rsa" ]; then
+
+            #Using -u I am running the command with the users privileges. I generate an ssh key using ssh-keygen
+            #-t will specify the type of key to rsa. Then -b for the bits of the key. I then use -f to specify where
+            #to create the key and this will be under the users home directory. -q makes the creation of the key silent
+            #and -N quotes makes the creation of the key passwordless.
+
             sudo -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
+
+            #if the ssh keygen command worked due to ahving a exit status of 0 meaning success
+            #then display text the key was made for dennis
+
             if [ $? -eq 0 ]; then
+
                 echo "Made RSA key for Dennis"
+
             fi
         fi
 
-        #generate ssh keys using ed25519 if it doesn't exist for the user
+        #using ! -f will check if the file does not exist. If file /home/user/.ssh/id_ed25519 does not exist run the block of code
+
         if [ ! -f "/home/$user/.ssh/id_ed25519" ]; then
+
+            #Using -u the user privileges are used for the following command. Using ssh-keygen I create an ssh key
+            #I specify the type using -t to create an ed25519 key and -f will specify where the created key goes this
+            #being /home/user/.ssh/id_ed25519. Using -q to make the key creation quiet to the output. I then
+            #use -N quotes to make the passphrase requirement empty.
+
             sudo -u "$user" ssh-keygen -t ed25519 -f "/home/$user/.ssh/id_ed25519" -q -N ""
+
+            #If the key creation was a success then the if statement will execute as the exit status will be equal to 0
+
             if [ $? -eq 0 ]; then
+
                 echo "Made ed25519 key for Dennis"
+
             fi
         fi
 
-        # Add the generated public keys to authorized_keys file
+        #For the following cat commands. I am appending the contents of the id_rsa.pub and id_ed25519.pub to the users
+        #authorized_keys file, this being for dennis. 
+
         cat "/home/$user/.ssh/id_rsa.pub" >> "/home/$user/.ssh/authorized_keys"
         cat "/home/$user/.ssh/id_ed25519.pub" >> "/home/$user/.ssh/authorized_keys"
+
         #Give the key to dennis and append it to the file authorized_keys using the file path /home/dennis/.ssh/authorized_keys
         echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLnKfP0GSqbWSGYW/nC7UFLpfmgZTLUVlE2q1+jOHvDlUz+y0iCGdz+1WzILJeckv9EPaW1bVRLRuk1YQD9K7dGpXdRDM6Vt2g/EaQK+d+9L3aUhQj+6B3JlRGq+Yh0g/k0KvFCahUMyGNu47Vc6rHuKwM30be3Vi8biW1w/Sy2gGYevwM1byN3RkMDTy9LaLVf6OH9x/NM//xLJL5s6GjIKivAa3KBq63/3ZQZll3BlYp8bfwIFsKrBlLYW62UyrNG/ZiyL66XW6KlANMFg5/CQ3IvH/U9pQhStYP3p7PEKK5T4FS2trgsfU6JZxasufuK41UrYCDZ1FdMf user@example.com" >> "/home/dennis/.ssh/authorized_keys"
+
+        #if the key was appended successfully the exit status of 0 will execute the if statement stating dennis had the key added
+
         if [ $? -eq 0 ]; then
+
             echo "Added Key to Dennis' key folder!"
         fi
 
     fi
 done
+
+#creating a variable called interface_name and storing my commands output into it. 
+#I am using the ip route command to then filter the output into awk. I am filtering specifically for default
+#and then going 5 fields from that reference point. This being the systems ethernet interface.
+#I then use this in my net plan config.
 
 interface_name=$(ip route | awk '/default/ {print $5}')
 

@@ -95,7 +95,7 @@ if [ $? -ne 0 ]; then
 
     fi
 
-    echo "Restarting SSH."
+    echo "Restarting SSH..."
 
     #I then restart SSH services using systemctl restart command
 
@@ -105,7 +105,7 @@ if [ $? -ne 0 ]; then
 
     if [ $? -eq 0 ]; then
 
-        echo "SSH Setup complete.."
+        echo "SSH Setup complete."
 
     fi
 
@@ -148,7 +148,7 @@ else
 
     fi
 
-    echo "Restarting SSH."
+    echo "Restarting SSH..."
 
     #I then restart the SSH service to apply the changes correctly
 
@@ -187,7 +187,7 @@ if [ $? -ne 0 ]; then
 
     fi
 
-    echo "Setting config for Apache2."
+    echo "Setting config for Apache2..."
 
     #I then enable the ssl module for apache using the a2enmod command
 
@@ -201,7 +201,7 @@ if [ $? -ne 0 ]; then
 
     fi
 
-    echo "Restarting Apache2 to complete setup."
+    echo "Restarting Apache2 to complete setup..."
 
     #restart the apache2 service using the system ctls restart command
 
@@ -220,7 +220,7 @@ if [ $? -ne 0 ]; then
 else
 
     echo "Apache2 web server is already installed."
-    echo "Will apply settings to apache from this script."
+    echo "Will apply settings to apache from this script..."
 
     #I am enabling the ssl module for apache2 using the a2enmod command
 
@@ -234,7 +234,7 @@ else
 
     fi
 
-    echo "Restarting Apache2 to complete setup."
+    echo "Restarting Apache2 to complete setup..."
 
     #restart the apache2 service using systemctl restart command
 
@@ -273,7 +273,7 @@ if [ $? -ne 0 ]; then
 
     fi
 
-    echo "Setting script config to squid settings."
+    echo "Setting script config to squid settings..."
 
     #Using sed -i I am overwriting the text. using/s I am substituting http_port 3128 with http_port 3128
     #this is to ensure that this is the set port even though it seems redundant
@@ -289,7 +289,7 @@ if [ $? -ne 0 ]; then
 
     fi
 
-    echo "restarting Squid."
+    echo "Restarting Squid..."
 
     #restart squid service using systemctl restart command to ensure everything works and applies.
 
@@ -309,7 +309,7 @@ if [ $? -ne 0 ]; then
 else
 
     echo "Squid web proxy is already installed."
-    echo "Setting configuration of this script to squid."
+    echo "Setting configuration of this script to squid..."
 
     #Using sed -i I am overwriting the text. using/s I am substituting http_port 3128 with http_port 3128.
     #This is redundant for ensuring the correct text is in place otherwise it doesn't exist and my if statment will tell me
@@ -324,7 +324,7 @@ else
 
     fi
 
-    echo "Restarting Squid service."
+    echo "Squid is restarting..."
 
     #I then restart the squid service using the systemctl restart command
 
@@ -368,7 +368,7 @@ if [[ $(ufw status | grep -w "Status: active") ]]; then
 
 else
 
-  echo "Enabling UFW firewall..."
+  echo "Enabling UFW firewall."
 
   #turn on the firewall using ufw enable command
 

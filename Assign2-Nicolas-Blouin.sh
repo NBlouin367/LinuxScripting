@@ -6,8 +6,8 @@
 #Course Code: COMP2137
 
 #This if statement takes the hostname variable of the system and compares
-#it to the string autosrv using the != I specify if it's not equal to then run the code in this block
-#I then echo the name autosrv into the hsotname file on the system to persist it through rebooting
+#it to the string autosrv using the != I specify if it is not equal to then run the code in this block
+#I then echo the name autosrv into the hostname file on the system to persist it through rebooting
 #then I set the host name using hostnamectl 
 
 if [[ $(hostname) != "autosrv" ]]; then
@@ -28,7 +28,7 @@ if [[ $(hostname) != "autosrv" ]]; then
     fi
 
 #if the if statement condition does not execute then run the else
-#it will just display some text saying the hsot name is already set up.
+#it will just display some text saying the host name is already set up.
 
 else
     echo "Hostname is already set correctly."
@@ -39,7 +39,7 @@ fi
 
 dpkg -s openssh-server &> /dev/null
 
-#when the exit status of the previous dpkg status  command is not equal to 0 then run the package installs
+#when the exit status of the previous dpkg status command is not equal to 0 then run the package installs
 #since it is not installed on the system. 
 
 if [ $? -ne 0 ]; then
@@ -53,12 +53,11 @@ if [ $? -ne 0 ]; then
         echo "openssh install complete."
     fi
 
-    # Configure SSH server
     echo "Configuring SSH settings."
 
     echo "Setting password authentication to NO"
 
-    #using sed -i I am editing the file directly with no backups, essentially I am overwriting what is there.
+    #using sed -i I am editing the file directly with no backups. Essentially I am overwriting what is there.
     #using the s/ I am using subtitution to repplace the text of PasswordAuthentication yes to a no.
 
     sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
@@ -92,7 +91,7 @@ if [ $? -ne 0 ]; then
         echo "SSH Setup complete.."
     fi
 
-#If the previous if statement checking for if SSH was installed doesn't execute then run this else
+#If the previous if statement checking for if SSH was installed does not execute then run this else
 #It displays some text saying SSH is already installed
 
 else
@@ -139,48 +138,82 @@ else
     fi
 fi
 
-
+#I use a dpkg -s to check the status of the apache2 package this will check if it is installed on the system
+#I then redirect to the null file to discard the output
 
 dpkg -s apache2 &> /dev/null
+
+#if the exit status of the dpkg command is not equal to 0 this means unccessful and it is not installed on the system
+#The if statement will then be executed to install it.
+
 if [ $? -ne 0 ]; then
     echo "Installing Apache2 web server..."
+
+    #installing apache2 using apt-get and -y to say yes to all install prompts so the script isn't interupted
+
     sudo apt-get install -y apache2 > /dev/null
+
+    #if the install worked then exit status 0 will execute this if block saying installed.
 
     if [ $? -eq 0 ]; then
         echo "Installed Apache2."
     fi
 
-    # Configure Apache2
     echo "Setting config for Apache2."
 
+    #I then enable the ssl module for apache using the a2enmod command
+
     sudo a2enmod ssl > /dev/null
+
+    #if the previous command executes correctly then the if statement will run as the exit status will check out as a 0
 
     if [ $? -eq 0 ]; then
         echo "config enabled successfully."
     fi
 
     echo "Restarting Apache2 to complete setup."
+
+    #restart the apache2 service using the system ctls restart command
+
     sudo systemctl restart apache2
+ 
+    #if the restart worked run this if statement as exit staus will be equal to 0
+
     if [ $? -eq 0 ]; then
         echo "Apache setup complete."
     fi
 
+#If the previous dpkg  if statement did not execute then run this else
+
 else
     echo "Apache2 web server is already installed."
     echo "Will apply settings to apache from this script."
+
+    #I am enabling the ssl module for apache2 using the a2enmod command
+
     sudo a2enmod ssl > /dev/null
+
+    #if this enabled command worked then run this if statement saying success
 
     if [ $? -eq 0 ]; then
         echo "Apache settings applied successfully."
     fi
 
     echo "Restarting Apache2 to complete setup."
+
+    #restart the apache2 service using systemctl restart command
+
     sudo systemctl restart apache2
+
+    #when the restart command is successful run this if statement as the exit status is equal to 0
+
     if [ $? -eq 0 ]; then
         echo "Apache setup complete."
     fi
 
 fi
+
+
 
 dpkg -s squid &> /dev/null
 if [ $? -ne 0 ]; then

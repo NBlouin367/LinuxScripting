@@ -143,7 +143,7 @@ fi
 
 dpkg -s apache2 &> /dev/null
 
-#if the exit status of the dpkg command is not equal to 0 this means unccessful and it is not installed on the system
+#if the exit status of the dpkg command is not equal to 0 this means unsuccessful and it is not installed on the system
 #The if statement will then be executed to install it.
 
 if [ $? -ne 0 ]; then
@@ -213,47 +213,82 @@ else
 
 fi
 
-
+#using dpkg -s to check the staus of squid to see if it is installed or not. when the exit status is anyhting but a 0
+#the if statment will trigger which will install squid as it is not on the system.
 
 dpkg -s squid &> /dev/null
+
+#if the previous dpkg command is not equal to a 0 run this if statement since squid is not installed
+
 if [ $? -ne 0 ]; then
 
     echo "Installing Squid web proxy..."
+
+    #run apt-get to install squid using a -y to accept all install prompts
+
     sudo apt-get install -y squid > /dev/null
+
+    #if the previous exit staus is a 0 squid install was a success and then run the if statment displaying installed
+
     if [ $? -eq 0 ]; then
         echo "Squid installed."
     fi
 
-    # Configure Squid
     echo "Setting script config to squid settings."
+
+    #Using sed -i I am overwriting the text. using/s I am substituting http_port 3128 with http_port 3128
+    #this is to ensure that this is the set port even though it seems redundant
+
     sudo sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf
+
+    #if the replcament sed command worked then it will display settings applied as the if statment goes off due to exit status
+    #evaluating to a 0
 
     if [ $? -eq 0 ]; then
         echo "Squid settings applied."
     fi
 
     echo "restarting Squid."
+
+    #restart squid service using systemctl restart command to ensure everything works and applies.
+
     sudo systemctl restart squid
+
+    #when the restart command works run this if statement since the exit staus will be equal to 0 and say setup complete
+
     if [ $? -eq 0 ]; then
         echo "Squid setup complete."
     fi
+
+#if squid was installed already the above if statement checking would not have ran so the else goes off
+#I then run the config commands again to ensure the system is setup correctly anyway
+
 else
     echo "Squid web proxy is already installed."
     echo "Setting configuration of this script to squid."
-    # Configure Squid
+
+    #Using sed -i I am overwriting the text. using/s I am substituting http_port 3128 with http_port 3128.
+    #This is redundant for ensuring the correct text is in place otherwise it doesn't exist and my if statment will tell me
+
     sudo sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf
+
+    #if the exit staus is 0 then the sed command will have worked and the if statment will run saying setup correct
 
     if [ $? -eq 0 ]; then
         echo "Squid was setup correctly."
     fi
 
     echo "Restarting Squid service."
+
+    #I then restart the squid service using the systemctl restart command
+
     sudo systemctl restart squid
     if [ $? -eq 0 ]; then
         echo "Squid setup complete."
     fi
 
 fi
+
 
 
 if [[ $(ufw status | grep -w "Status: active") ]]; then

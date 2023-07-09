@@ -11,6 +11,16 @@
 #network settings, software installation, firewall altering, and lastly user accounts.
 #This script will change specific files within the system using sequences of commands and condition tests.
 
+echo "Please Enter Your Sudo Password to run this script:"
+
+sudo -v
+
+if [ $? -ne 0 ]; then
+    echo "Incorrect sudo password. Stopping the script..."
+    exit 1
+fi
+
+
 
 #This if statement takes the hostname variable of the system and compares
 #it to the string autosrv using the != I specify if it is not equal to then run the code in this block

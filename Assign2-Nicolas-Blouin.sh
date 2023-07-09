@@ -275,7 +275,9 @@ else
     #if the exit staus is 0 then the sed command will have worked and the if statment will run saying setup correct
 
     if [ $? -eq 0 ]; then
+
         echo "Squid was setup correctly."
+
     fi
 
     echo "Restarting Squid service."
@@ -283,7 +285,11 @@ else
     #I then restart the squid service using the systemctl restart command
 
     sudo systemctl restart squid
+
+    #if the exit status is equal to 0 from the previous command then this if statement executes
+
     if [ $? -eq 0 ]; then
+
         echo "Squid setup complete."
     fi
 
@@ -456,9 +462,9 @@ for user in "${users[@]}"; do
         if [ ! -f "/home/$user/.ssh/id_rsa" ]; then
 
             #Using -u I am running the command with the users privileges. I generate an ssh key using ssh-keygen
-            #-t will specify the type of key to rsa. Then -b for the bits of the key. I then use -f to specify where
-            #to create the key and this will be under the users home directory. -q makes the creation of the key silent
-            #and -N quotes makes the creation of the key passwordless.
+            # with the following option -t which will specify the type of key to rsa. Then -b for the bits of the key. 
+            #I then use -f for file to specify where to create the key and this will be under the users home directory.
+            #-q makes the creation of the key silent and -N quotes makes the creation of the key passwordless.
 
             sudo -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
 
@@ -518,6 +524,8 @@ done
 
 interface_name=$(ip route | awk '/default/ {print $5}')
 
+#I then set a variable storing my net plan config. Using the address and servers according to the assignment.
+
 config="
 network:
   version: 2
@@ -525,7 +533,7 @@ network:
   ethernets:
     $interface_name:
       addresses: [192.168.16.21/24]
-      routes: 
+      routes:
         - to: 0.0.0.0/0
           via: 192.168.16.1
       nameservers:
@@ -533,11 +541,20 @@ network:
         search: [home.arpa, localdomain]
 "
 
+#I make a new variable called new_netplan which creates a new netplan file on the system
+
 new_netplan="/etc/netplan/new_netplan_config.yaml"
+
+#After creating a netplan config and a new netplan file, I then pipe my output of my echo config command into the tee command
+#which will write the echo contents into my new_netplan file.
 
 echo "$config" | sudo tee "$new_netplan" > /dev/null
 
+#I am then applying my netplan settings to the system and discarding my outputs of the command to /dev/null
+
 sudo netplan apply &> /dev/null
+
+#if the netplan apply command works then the exit status will result to 0 which runs my if statement displaying netplan applied
 
 if [ $? -eq 0 ]; then
     echo "Netplan configuration was applied!"

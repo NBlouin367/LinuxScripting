@@ -5,28 +5,50 @@
 #Student ID: 200410446
 #Course Code: COMP2137
 
-#Description
+#This if statement takes the hostname variable of the system and compares
+#it to the string autosrv using the != I specify if it's not equal to then run the code in this block
+#I then echo the name autosrv into the hsotname file on the system to persist it through rebooting
+#then I set the host name using hostnamectl 
+
 if [[ $(hostname) != "autosrv" ]]; then
     echo "Updating the hostname"
     echo "autosrv" > /etc/hostname
     hostnamectl set-hostname autosrv
     
+    #if the exit status is 0, the hostname change was successful then display it worked
+   
     if [ $? -eq 0 ]; then
        echo "Hostname has been changed!"
     fi
+
+    #if the exit status not equal to 0 meaning unsuccessful then display it failed
 
     if [ $? -ne 0 ]; then
        echo "Hostname change failed!"
     fi
 
+#if the if statement condition does not execute then run the else
+#it will just display some text saying the hsot name is already set up.
+
 else
     echo "Hostname is already set correctly."
 fi
 
+#using dpkg -s I can check the status of the package I want in this case openssh-server
+#I then redirect unnecessary output to /dev/null. 
+
 dpkg -s openssh-server &> /dev/null
+
+#when the exit status of the previous dpkg status  command is not equal to 0 then run the package installs
+#since it is not installed on the system. 
+
 if [ $? -ne 0 ]; then
     echo "Installing SSH server..."
+
+    #installing openssh-server using the -y option just automatically assumes yes for all the install prompts
+
     sudo apt-get install -y openssh-server > /dev/null
+
     if [ $? -eq 0 ]; then
         echo "openssh install complete."
     fi
@@ -35,13 +57,23 @@ if [ $? -ne 0 ]; then
     echo "Configuring SSH settings."
 
     echo "Setting password authentication to NO"
+
+    #using sed -i I am editing the file directly with no backups, essentially I am overwriting what is there.
+    #using the s/ I am using subtitution to repplace the text of PasswordAuthentication yes to a no.
+
     sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+
+    #If the previous sed command had an exit status of 0 meaning success then I output a message saying settings applied
 
     if [ $? -eq 0 ]; then
         echo "Password authentication settings applied."
     fi
 
     echo "Setting SSH key authentication to YES"
+
+    #using sed -i I am overwriting what is there using inplace editing.
+    #using the s/ I am using subtitution to repplace the text of PubkeyAuthentication no to a yes.
+
     sudo sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
     if [ $? -eq 0 ]; then
         echo "SSH Key authentication settings set successfully."
@@ -49,10 +81,20 @@ if [ $? -ne 0 ]; then
 
 
     echo "Restarting SSH."
+
+    #I then restart SSH services using systemctl restart command
+
     sudo systemctl restart sshd
+
+    #If the restart was a success then run this if block saying setup was complete
+
     if [ $? -eq 0 ]; then
         echo "SSH Setup complete.."
     fi
+
+#If the previous if statement checking for if SSH was installed doesn't execute then run this else
+#It displays some text saying SSH is already installed
+
 else
     echo "SSH server is already installed."
     echo "Going to apply this scripts config settings for SSH"

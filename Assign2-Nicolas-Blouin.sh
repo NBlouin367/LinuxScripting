@@ -68,7 +68,7 @@ if [ $? -ne 0 ]; then
     echo "Setting password authentication to NO"
 
     #using sed -i I am editing the file directly with no backups. Essentially I am overwriting what is there.
-    #using the s/ I am using subtitution to repplace the text of PasswordAuthentication yes to a no.
+    #using the s/ I am using subtitution to replace the text of PasswordAuthentication yes to a no.
 
     sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 
@@ -83,9 +83,11 @@ if [ $? -ne 0 ]; then
     echo "Setting SSH key authentication to YES"
 
     #using sed -i I am overwriting what is there using inplace editing.
-    #using the s/ I am using subtitution to repplace the text of PubkeyAuthentication no to a yes.
+    #using the s/ I am using subtitution to replace the text of PubkeyAuthentication no to a yes.
 
     sudo sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+
+    #if the previous command was successful then the if statement will run due to exit status 0 
 
     if [ $? -eq 0 ]; then
 
@@ -248,7 +250,7 @@ else
 
 fi
 
-#using dpkg -s to check the staus of squid to see if it is installed or not. when the exit status is anyhting but a 0
+#using dpkg -s to check the staus of squid to see if it is installed or not. when the exit status is anything but a 0
 #the if statment will trigger which will install squid as it is not on the system.
 
 dpkg -s squid &> /dev/null
@@ -257,7 +259,7 @@ dpkg -s squid &> /dev/null
 
 if [ $? -ne 0 ]; then
 
-    echo "Installing Squid web proxy..."
+    echo "Installing Squid..."
 
     #run apt-get to install squid using a -y to accept all install prompts
 
@@ -389,7 +391,7 @@ else
 fi
 
 
-#Creating my list of users to make on the system per assignment requirments
+#Creating my list of users to make on the system per assignment requirements
 
 users=("dennis" "aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
 
@@ -417,7 +419,8 @@ for user in "${users[@]}"; do
 
         echo "adding user $user..."
 
-        # Generate random password using the built in automated password genrator built into the linux operating system
+        # Generate random password using the built in automated password generator built into the linux operating system
+        #-n for number of passwords to make and -m for min length.
 
         password=$(apg -n 1 -m 10)
 
@@ -428,6 +431,7 @@ for user in "${users[@]}"; do
         #if the directory for the user in the list doesn't exist. then I create it
         #by using -u I run the mkdir command and  chmod command with the user's privileges
         #I then set permissions so the user can access the directory without issues
+
         if [ ! -d "/home/$user/.ssh" ]; then
 
             sudo -u "$user" mkdir "/home/$user/.ssh"

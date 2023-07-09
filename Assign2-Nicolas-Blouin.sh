@@ -11,6 +11,7 @@
 #then I set the host name using hostnamectl 
 
 if [[ $(hostname) != "autosrv" ]]; then
+
     echo "Updating the hostname"
     echo "autosrv" > /etc/hostname
     hostnamectl set-hostname autosrv
@@ -18,20 +19,26 @@ if [[ $(hostname) != "autosrv" ]]; then
     #if the exit status is 0, the hostname change was successful then display it worked
 
     if [ $? -eq 0 ]; then
+
        echo "Hostname has been changed!"
+
     fi
 
     #if the exit status not equal to 0 meaning unsuccessful then display it failed
 
     if [ $? -ne 0 ]; then
+
        echo "Hostname change failed!"
+
     fi
 
 #if the if statement condition does not execute then run the else
 #it will just display some text saying the host name is already set up.
 
 else
+
     echo "Hostname is already set correctly."
+
 fi
 
 #using dpkg -s I can check the status of the package I want in this case openssh-server
@@ -43,6 +50,7 @@ dpkg -s openssh-server &> /dev/null
 #since it is not installed on the system.
 
 if [ $? -ne 0 ]; then
+
     echo "Installing SSH server..."
 
     #installing openssh-server using the -y option just automatically assumes yes for all the install prompts
@@ -50,7 +58,9 @@ if [ $? -ne 0 ]; then
     sudo apt-get install -y openssh-server > /dev/null
 
     if [ $? -eq 0 ]; then
+
         echo "openssh install complete."
+
     fi
 
     echo "Configuring SSH settings."
@@ -65,7 +75,9 @@ if [ $? -ne 0 ]; then
     #If the previous sed command had an exit status of 0 meaning success then I output a message saying settings applied
 
     if [ $? -eq 0 ]; then
+
         echo "Password authentication settings applied."
+
     fi
 
     echo "Setting SSH key authentication to YES"
@@ -74,10 +86,12 @@ if [ $? -ne 0 ]; then
     #using the s/ I am using subtitution to repplace the text of PubkeyAuthentication no to a yes.
 
     sudo sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
-    if [ $? -eq 0 ]; then
-        echo "SSH Key authentication settings set successfully."
-    fi
 
+    if [ $? -eq 0 ]; then
+
+        echo "SSH Key authentication settings set successfully."
+
+    fi
 
     echo "Restarting SSH."
 
@@ -88,13 +102,16 @@ if [ $? -ne 0 ]; then
     #If the restart was a success then run this if block saying setup was complete
 
     if [ $? -eq 0 ]; then
+
         echo "SSH Setup complete.."
+
     fi
 
 #If the previous if statement checking for if SSH was installed does not execute then run this else
 #It displays some text saying SSH is already installed
 
 else
+
     echo "SSH server is already installed."
     echo "Going to apply this scripts config settings for SSH"
 
@@ -109,7 +126,9 @@ else
     #if the sed command was successful then the if block runs saying set correctly
 
     if [ $? -eq 0 ]; then
+
         echo "Password authentication set correctly."
+
     fi
 
     echo "Setting SSH key authentication to YES"
@@ -122,7 +141,9 @@ else
     #When the previous sed command works then I use an exit status check if statement to display some text saying it was set up
 
     if [ $? -eq 0 ]; then
+
         echo "SSH key authentication set correctly."
+
     fi
 
     echo "Restarting SSH."
@@ -134,7 +155,9 @@ else
     #if the exit status was a 0 it succeded and I show some text to output saying setup complete
 
     if [ $? -eq 0 ]; then
+
         echo "SSH setup Complete."
+
     fi
 fi
 
@@ -147,6 +170,7 @@ dpkg -s apache2 &> /dev/null
 #The if statement will then be executed to install it.
 
 if [ $? -ne 0 ]; then
+
     echo "Installing Apache2 web server..."
 
     #installing apache2 using apt-get and -y to say yes to all install prompts so the script isn't interupted
@@ -156,7 +180,9 @@ if [ $? -ne 0 ]; then
     #if the install worked then exit status 0 will execute this if block saying installed.
 
     if [ $? -eq 0 ]; then
+
         echo "Installed Apache2."
+
     fi
 
     echo "Setting config for Apache2."
@@ -168,7 +194,9 @@ if [ $? -ne 0 ]; then
     #if the previous command executes correctly then the if statement will run as the exit status will check out as a 0
 
     if [ $? -eq 0 ]; then
+
         echo "config enabled successfully."
+
     fi
 
     echo "Restarting Apache2 to complete setup."
@@ -176,16 +204,19 @@ if [ $? -ne 0 ]; then
     #restart the apache2 service using the system ctls restart command
 
     sudo systemctl restart apache2
- 
+
     #if the restart worked run this if statement as exit staus will be equal to 0
 
     if [ $? -eq 0 ]; then
+
         echo "Apache setup complete."
+
     fi
 
 #If the previous dpkg  if statement did not execute then run this else
 
 else
+
     echo "Apache2 web server is already installed."
     echo "Will apply settings to apache from this script."
 
@@ -196,7 +227,9 @@ else
     #if this enabled command worked then run this if statement saying success
 
     if [ $? -eq 0 ]; then
+
         echo "Apache settings applied successfully."
+
     fi
 
     echo "Restarting Apache2 to complete setup."
@@ -208,7 +241,9 @@ else
     #when the restart command is successful run this if statement as the exit status is equal to 0
 
     if [ $? -eq 0 ]; then
+
         echo "Apache setup complete."
+
     fi
 
 fi
@@ -231,7 +266,9 @@ if [ $? -ne 0 ]; then
     #if the previous exit staus is a 0 squid install was a success and then run the if statment displaying installed
 
     if [ $? -eq 0 ]; then
+
         echo "Squid installed."
+
     fi
 
     echo "Setting script config to squid settings."
@@ -245,7 +282,9 @@ if [ $? -ne 0 ]; then
     #evaluating to a 0
 
     if [ $? -eq 0 ]; then
+
         echo "Squid settings applied."
+
     fi
 
     echo "restarting Squid."
@@ -257,13 +296,16 @@ if [ $? -ne 0 ]; then
     #when the restart command works run this if statement since the exit staus will be equal to 0 and say setup complete
 
     if [ $? -eq 0 ]; then
+
         echo "Squid setup complete."
+
     fi
 
 #if squid was installed already the above if statement checking would not have ran so the else goes off
 #I then run the config commands again to ensure the system is setup correctly anyway
 
 else
+
     echo "Squid web proxy is already installed."
     echo "Setting configuration of this script to squid."
 
@@ -291,6 +333,7 @@ else
     if [ $? -eq 0 ]; then
 
         echo "Squid setup complete."
+
     fi
 
 fi
@@ -354,7 +397,6 @@ users=("dennis" "aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perri
 #By stating ${users[@]} the @ will expand my array treating every
 #item as its own word separately, I used this method to negate potential errors
 
-
 for user in "${users[@]}"; do
 
     # Check if user already exists by checking the id of the user to see if it exists
@@ -370,37 +412,45 @@ for user in "${users[@]}"; do
         #I use the useradd command to add the user with the variable name $user for whichever user is being itterated at the time
         #I use the -m option to make a home directory if it doesn't exist. I then use the -s to set the shell for the user
         #I specify the shell as /bin/bash
+
         sudo useradd -m -s /bin/bash "$user"
+
         echo "adding user $user..."
 
         # Generate random password using the built in automated password genrator built into the linux operating system
+
         password=$(apg -n 1 -m 10)
 
         # Set the generated password for the user
+
         echo "$user:$password" | sudo chpasswd
 
-        #if the home directory for the user in the list doesn't have .ssh then I create it
+        #if the directory for the user in the list doesn't exist. then I create it
         #by using -u I run the mkdir command and  chmod command with the user's privileges
         #I then set permissions so the user can access the directory without issues
-
         if [ ! -d "/home/$user/.ssh" ]; then
+
             sudo -u "$user" mkdir "/home/$user/.ssh"
             sudo -u "$user" chmod 700 "/home/$user/.ssh"
+
         fi
 
         #I run an if statement using ! -f to check if the file does not exist. This file being /home/user/.ssh/id_rsa
+
         if [ ! -f "/home/$user/.ssh/id_rsa" ]; then
 
             #Then using -u I am running the command with the users privileges. I then generate an ssh key using ssh-keygen
             #using -t to specify the type of key to rsa. then -b for the bits of the key. I then use -f to specify where
             #to create the key and this will be under the users home directory. -q makes the creation of the key silent
-            #and -N quotes makes the creation of the key passwordless so my script will just run with no interuptions.
+            #and -N quotes makes the creation of the key to not require a password so my script will just run with no interuptions.
 
             sudo -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
+
         fi
 
         #This if statement uses ! -f to check if the file does not exist. The file I am checking for is /home/user/.ssh/id_ed25519
         #if it doesn't exist run the if statment.
+
         if [ ! -f "/home/$user/.ssh/id_ed25519" ]; then
 
             #Using -u the user privileges will be used for the following command. An ssh key is then generated using ssh-keygen
@@ -427,6 +477,7 @@ for user in "${users[@]}"; do
 
         echo "User '$user' created successfully."
         echo "Password for '$user' is: $password"
+
     fi
 done
 
@@ -461,8 +512,8 @@ for user in "${users[@]}"; do
 
         if [ ! -f "/home/$user/.ssh/id_rsa" ]; then
 
-            #Using -u I am running the command with the users privileges. I generate an ssh key using ssh-keygen
-            # with the following option -t which will specify the type of key to rsa. Then -b for the bits of the key. 
+            #I am running the command with the users privileges by using option -u. I generate an ssh key using ssh-keygen
+            # with the following option -t which will specify the type of key to rsa. specify the key bit length using -b.Then 
             #I then use -f for file to specify where to create the key and this will be under the users home directory.
             #-q makes the creation of the key silent and -N quotes makes the creation of the key passwordless.
 
@@ -482,10 +533,10 @@ for user in "${users[@]}"; do
 
         if [ ! -f "/home/$user/.ssh/id_ed25519" ]; then
 
-            #Using -u the user privileges are used for the following command. Using ssh-keygen I create an ssh key
+            #Using -u the privileges of the user are used for the following command. The command ssh-keygen will create an ssh key
             #I specify the type using -t to create an ed25519 key and -f will specify where the created key goes this
-            #being /home/user/.ssh/id_ed25519. Using -q to make the key creation quiet to the output. I then
-            #use -N quotes to make the passphrase requirement empty.
+            #being /home/user/.ssh/id_ed25519. To make my output silent I used option -q for quiet. I then
+            #make the password requirement empty using a -N with empty quotes.
 
             sudo -u "$user" ssh-keygen -t ed25519 -f "/home/$user/.ssh/id_ed25519" -q -N ""
 
@@ -499,12 +550,13 @@ for user in "${users[@]}"; do
         fi
 
         #For the following cat commands. I am appending the contents of the id_rsa.pub and id_ed25519.pub to the users
-        #authorized_keys file, this being for dennis. 
+        #authorized_keys file, this being for dennis.
 
         cat "/home/$user/.ssh/id_rsa.pub" >> "/home/$user/.ssh/authorized_keys"
         cat "/home/$user/.ssh/id_ed25519.pub" >> "/home/$user/.ssh/authorized_keys"
 
         #Give the key to dennis and append it to the file authorized_keys using the file path /home/dennis/.ssh/authorized_keys
+
         echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLnKfP0GSqbWSGYW/nC7UFLpfmgZTLUVlE2q1+jOHvDlUz+y0iCGdz+1WzILJeckv9EPaW1bVRLRuk1YQD9K7dGpXdRDM6Vt2g/EaQK+d+9L3aUhQj+6B3JlRGq+Yh0g/k0KvFCahUMyGNu47Vc6rHuKwM30be3Vi8biW1w/Sy2gGYevwM1byN3RkMDTy9LaLVf6OH9x/NM//xLJL5s6GjIKivAa3KBq63/3ZQZll3BlYp8bfwIFsKrBlLYW62UyrNG/ZiyL66XW6KlANMFg5/CQ3IvH/U9pQhStYP3p7PEKK5T4FS2trgsfU6JZxasufuK41UrYCDZ1FdMf user@example.com" >> "/home/dennis/.ssh/authorized_keys"
 
         #if the key was appended successfully the exit status of 0 will execute the if statement stating dennis had the key added
@@ -512,12 +564,13 @@ for user in "${users[@]}"; do
         if [ $? -eq 0 ]; then
 
             echo "Added Key to Dennis' key folder!"
+
         fi
 
     fi
 done
 
-#creating a variable called interface_name and storing my commands output into it. 
+#creating a variable called interface_name and storing my commands output into it.
 #I am using the ip route command to then filter the output into awk. I am filtering specifically for default
 #and then going 5 fields from that reference point. This being the systems ethernet interface.
 #I then use this in my net plan config.
@@ -557,5 +610,7 @@ sudo netplan apply &> /dev/null
 #if the netplan apply command works then the exit status will result to 0 which runs my if statement displaying netplan applied
 
 if [ $? -eq 0 ]; then
+
     echo "Netplan configuration was applied!"
+
 fi

@@ -5,6 +5,13 @@
 #Student ID: 200410446
 #Course Code: COMP2137
 
+
+#Script Description:
+#The purpose of my script is to alter the system configuration. This includes the system hostname,
+#network settings, software installation, firewall altering, and lastly user accounts.
+#This script will change specific files within the system using sequences of commands and condition tests.
+
+
 #This if statement takes the hostname variable of the system and compares
 #it to the string autosrv using the != I specify if it is not equal to then run the code in this block
 #I then echo the name autosrv into the hostname file on the system to persist it through rebooting

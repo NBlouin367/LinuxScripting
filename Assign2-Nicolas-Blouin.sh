@@ -33,8 +33,8 @@ fi
 if [[ $(hostname) != "autosrv" ]]; then
 
     echo "Updating the hostname"
-    sudo echo "autosrv" > /etc/hostname
-    sudo hostnamectl set-hostname autosrv
+    echo "autosrv" > /etc/hostname
+    hostnamectl set-hostname autosrv
 
     #if the exit status is 0, the hostname change was successful then display it worked
 
@@ -64,7 +64,7 @@ fi
 #using dpkg -s I can check the status of the package I want in this case openssh-server
 #I then redirect unnecessary output to /dev/null.
 
-sudo dpkg -s openssh-server &> /dev/null
+dpkg -s openssh-server &> /dev/null
 
 #when the exit status of the previous dpkg status command is not equal to 0 then run the package installs
 #since it is not installed on the system.
@@ -75,7 +75,7 @@ if [ $? -ne 0 ]; then
 
     #installing openssh-server using the -y option just automatically assumes yes for all the install prompts
 
-    sudo apt-get install -y openssh-server > /dev/null
+    apt-get install -y openssh-server > /dev/null
 
     #when the exit status of the previous command is 0 meaning success run this if statment saying ssh install complete
 
@@ -92,7 +92,7 @@ if [ $? -ne 0 ]; then
     #using sed -i I am editing the file directly with no backups. Essentially I am overwriting what is there.
     #using the s/ I am using subtitution to replace the text of PasswordAuthentication yes to a no.
 
-    sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+    sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 
     #If the previous sed command had an exit status of 0 meaning success then I output a message saying settings applied
 
@@ -107,7 +107,7 @@ if [ $? -ne 0 ]; then
     #using sed -i I am overwriting what is there using inplace editing.
     #using the s/ I am using subtitution to replace the text of PubkeyAuthentication no to a yes.
 
-    sudo sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+    sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
 
     #if the previous command was successful then the if statement will run due to exit status 0 
 
@@ -121,7 +121,7 @@ if [ $? -ne 0 ]; then
 
     #I then restart SSH services using systemctl restart command
 
-    sudo systemctl restart sshd
+    systemctl restart sshd
 
     #If the restart was a success then run this if block saying setup was complete
 
@@ -145,7 +145,7 @@ else
     #Using sed -i I am inplace overwriting the text within the file /etc/ssh/sshd_config
     #the /s is for substitution replacing PasswordAuthentication yes to a no
 
-    sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+    sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 
     #if the sed command was successful then the if block runs saying set correctly
 
@@ -160,7 +160,7 @@ else
     #using sed I am replacing the text within my specified file /etc/ssh/sshd_config
     #using the /s I am substituting the text to set the pubkeyAuthentication text from no to yes
 
-    sudo sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+    sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
 
     #When the previous sed command works then I use an exit status check if statement to display some text saying it was set up
 
@@ -174,7 +174,7 @@ else
 
     #I then restart the SSH service to apply the changes correctly
 
-    sudo systemctl restart sshd
+    systemctl restart sshd
 
     #if the exit status was a 0 it succeded and I show some text to output saying setup complete
 
@@ -188,7 +188,7 @@ fi
 #I use a dpkg -s to check the status of the apache2 package this will check if it is installed on the system
 #I then redirect to the null file to discard the output
 
-sudo dpkg -s apache2 &> /dev/null
+dpkg -s apache2 &> /dev/null
 
 #if the exit status of the dpkg command is not equal to 0 this means unsuccessful and it is not installed on the system
 #The if statement will then be executed to install it.
@@ -199,7 +199,7 @@ if [ $? -ne 0 ]; then
 
     #installing apache2 using apt-get and -y to say yes to all install prompts so the script isn't interupted
 
-    sudo apt-get install -y apache2 > /dev/null
+    apt-get install -y apache2 > /dev/null
 
     #if the install worked then exit status 0 will execute this if block saying installed.
 
@@ -213,7 +213,7 @@ if [ $? -ne 0 ]; then
 
     #I then enable the ssl module for apache using the a2enmod command
 
-    sudo a2enmod ssl > /dev/null
+    a2enmod ssl > /dev/null
 
     #if the previous command executes correctly then the if statement will run as the exit status will check out as a 0
 
@@ -227,7 +227,7 @@ if [ $? -ne 0 ]; then
 
     #restart the apache2 service using the system ctls restart command
 
-    sudo systemctl restart apache2
+    systemctl restart apache2
 
     #if the restart worked run this if statement as exit staus will be equal to 0
 
@@ -246,7 +246,7 @@ else
 
     #I am enabling the ssl module for apache2 using the a2enmod command
 
-    sudo a2enmod ssl > /dev/null
+    a2enmod ssl > /dev/null
 
     #if this enabled command worked then run this if statement saying success
 
@@ -260,7 +260,7 @@ else
 
     #restart the apache2 service using systemctl restart command
 
-    sudo systemctl restart apache2
+    systemctl restart apache2
 
     #when the restart command is successful run this if statement as the exit status is equal to 0
 
@@ -275,7 +275,7 @@ fi
 #using dpkg -s to check the staus of squid to see if it is installed or not. when the exit status is anything but a 0
 #the if statment will trigger which will install squid as it is not on the system.
 
-sudo dpkg -s squid &> /dev/null
+dpkg -s squid &> /dev/null
 
 #if the previous dpkg command is not equal to a 0 run this if statement since squid is not installed
 
@@ -285,7 +285,7 @@ if [ $? -ne 0 ]; then
 
     #run apt-get to install squid using a -y to accept all install prompts
 
-    sudo apt-get install -y squid > /dev/null
+    apt-get install -y squid > /dev/null
 
     #if the previous exit staus is a 0 squid install was a success and then run the if statment displaying installed
 
@@ -300,7 +300,7 @@ if [ $? -ne 0 ]; then
     #Using sed -i I am overwriting the text. using/s I am substituting http_port 3128 with http_port 3128
     #this is to ensure that this is the set port even though it seems redundant
 
-    sudo sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf
+    sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf
 
     #if the replcament sed command worked then it will display settings applied as the if statment goes off due to exit status
     #evaluating to a 0
@@ -315,7 +315,7 @@ if [ $? -ne 0 ]; then
 
     #restart squid service using systemctl restart command to ensure everything works and applies.
 
-    sudo systemctl restart squid
+    systemctl restart squid
 
     #when the restart command works run this if statement since the exit status will be equal to 0 and say setup complete
 
@@ -336,7 +336,7 @@ else
     #Using sed -i I am overwriting the text. using/s I am substituting http_port 3128 with http_port 3128.
     #This is redundant for ensuring the correct text is in place otherwise it doesn't exist and my if statment will tell me
 
-    sudo sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf
+    sed -i 's/http_port 3128/http_port 3128/' /etc/squid/squid.conf
 
     #if the exit staus is 0 then the sed command will have worked and the if statment will run saying setup correct
 
@@ -350,7 +350,7 @@ else
 
     #I then restart the squid service using the systemctl restart command
 
-    sudo systemctl restart squid
+    systemctl restart squid
 
     #if the exit status is equal to 0 from the previous command then this if statement executes
 
@@ -374,17 +374,17 @@ if [[ $(ufw status | grep -w "Status: active") ]]; then
   #Will add rules anyways even if the firewall is active
   #Setting all the ports I want to allow in the firewall configuration.
 
-  sudo ufw allow 22
+  ufw allow 22
 
-  sudo ufw allow 80
+  ufw allow 80
 
-  sudo ufw allow 443
+  ufw allow 443
 
-  sudo ufw allow 3128
+  ufw allow 3128
 
   #restarting the firewall to apply the new changes
 
-  sudo ufw reload
+  ufw reload
 
 #when the firewall is not on run the else and enable it and apply rules to allow my listed ports
 
@@ -394,19 +394,19 @@ else
 
   #turn on the firewall using ufw enable command
 
-  sudo ufw enable
+  ufw enable
 
-  sudo ufw allow 22
+  ufw allow 22
 
-  sudo ufw allow 80
+  ufw allow 80
 
-  sudo ufw allow 443
+  ufw allow 443
 
-  sudo ufw allow 3128
+  ufw allow 3128
 
   #restart the firewall to apply my settings
 
-  sudo ufw reload
+  ufw reload
 
   echo "Firewall turned on and setup was successful!"
 
@@ -437,7 +437,7 @@ for user in "${users[@]}"; do
         #I use the -m option to make a home directory if it doesn't exist. I then use the -s to set the shell for the user
         #I specify the shell as /bin/bash
 
-        sudo useradd -m -s /bin/bash "$user"
+        useradd -m -s /bin/bash "$user"
 
         echo "adding user $user..."
 
@@ -448,7 +448,7 @@ for user in "${users[@]}"; do
 
         # Set the generated password for the user by passing in the user and generated password into the chpasswd command using a pipe
 
-        echo "$user:$password" | sudo chpasswd
+        echo "$user:$password" | chpasswd
 
         #if the directory for the user in the list doesn't exist. then I create it
         #by using -u I run the mkdir command and  chmod command with the user's privileges
@@ -456,8 +456,8 @@ for user in "${users[@]}"; do
 
         if [ ! -d "/home/$user/.ssh" ]; then
 
-            sudo -u "$user" mkdir "/home/$user/.ssh"
-            sudo -u "$user" chmod 700 "/home/$user/.ssh"
+            -u "$user" mkdir "/home/$user/.ssh"
+            -u "$user" chmod 700 "/home/$user/.ssh"
 
         fi
 
@@ -470,7 +470,7 @@ for user in "${users[@]}"; do
             #to create the key. -q makes the creation of the key silent and -N quotes makes the creation of the 
             #key to not require a password so my script will just run with no interuptions.
 
-            sudo -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
+            -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
 
         fi
 
@@ -484,7 +484,7 @@ for user in "${users[@]}"; do
             #being /home/user/.ssh/id_ed25519. Then using -q to make the key creation silent/quiet to the output. I then 
             #use -N quotes to make the passphrase requirement empty for key creation.
 
-            sudo -u "$user" ssh-keygen -t ed25519 -f "/home/$user/.ssh/id_ed25519" -q -N ""
+            -u "$user" ssh-keygen -t ed25519 -f "/home/$user/.ssh/id_ed25519" -q -N ""
 
         fi
 
@@ -498,8 +498,8 @@ for user in "${users[@]}"; do
         #Meaning all of the directories, subdirectiories, and files will have the ownership changed to the user.
         #Using chmod 600 I am setting the user to have read and write permissions to authorized_keys
 
-        sudo chown -R "$user:$user" "/home/$user/.ssh"
-        sudo chmod 600 "/home/$user/.ssh/authorized_keys"
+        chown -R "$user:$user" "/home/$user/.ssh"
+        chmod 600 "/home/$user/.ssh/authorized_keys"
 
         echo "User '$user' created successfully."
         echo "Password for '$user' is: $password"
@@ -520,7 +520,7 @@ for user in "${users[@]}"; do
 
         #by using the usermod command with option -aG command I am adding dennis to the sudo group
 
-        sudo usermod -aG sudo dennis
+        usermod -aG sudo dennis
 
         #using ! -d the if statement is checking if the directory /home/user/.ssh does not exist. If it doesn't exist then run the block of code 
 
@@ -529,8 +529,8 @@ for user in "${users[@]}"; do
             #creates a directory called /home/user/.ssh using the users privileges
             #then chmod 700 will give read, write, and execute to the user for .ssh
 
-            sudo -u "$user" mkdir "/home/$user/.ssh"
-            sudo -u "$user" chmod 700 "/home/$user/.ssh"
+            -u "$user" mkdir "/home/$user/.ssh"
+            -u "$user" chmod 700 "/home/$user/.ssh"
 
         fi
 
@@ -543,7 +543,7 @@ for user in "${users[@]}"; do
             #I then use -f for file to specify where to create the key. -q makes the creation of the key silent 
             #and -N quotes makes the creation of the key passwordless.
 
-            sudo -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
+            -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
 
             #if the ssh keygen command worked due to ahving a exit status of 0 meaning success
             #then display text the key was made for dennis
@@ -564,7 +564,7 @@ for user in "${users[@]}"; do
             #being /home/user/.ssh/id_ed25519. To make my output silent I used option -q for quiet. I then
             #make the password requirement empty using a -N with empty quotes.
 
-            sudo -u "$user" ssh-keygen -t ed25519 -f "/home/$user/.ssh/id_ed25519" -q -N ""
+            -u "$user" ssh-keygen -t ed25519 -f "/home/$user/.ssh/id_ed25519" -q -N ""
 
             #If the key creation was a success then the if statement will execute as the exit status will be equal to 0
 
@@ -627,11 +627,11 @@ new_netplan="/etc/netplan/new_netplan_config.yaml"
 #After creating a netplan config and a new netplan file, I then pipe my output of my echo config command into the tee command
 #which will write the echo contents into my new_netplan file.
 
-echo "$config" | sudo tee "$new_netplan" > /dev/null
+echo "$config" | tee "$new_netplan" > /dev/null
 
 #I am then applying my netplan settings to the system and discarding my outputs of the command to /dev/null
 
-sudo netplan apply &> /dev/null
+netplan apply &> /dev/null
 
 #if the netplan apply command works then the exit status will result to 0 which runs my if statement displaying netplan applied
 

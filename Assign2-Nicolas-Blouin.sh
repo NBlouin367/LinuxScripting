@@ -20,7 +20,7 @@
 
 if [ "$EUID" -ne 0 ]; then
 
-  echo "This script must be run as a super user. Use sudo infront of your command to make sure it runs" >&2
+  echo "This script must be run as sudo/root. Either be root user or use sudo infront of your command to ensure it runs" >&2
 
   exit 1
 
@@ -438,7 +438,7 @@ for user in "${users[@]}"; do
         #I use the -m option to make a home directory if it doesn't exist. I then use the -s to set the shell for the user
         #I specify the shell as /bin/bash
 
-        useradd -m -s /bin/bash "$user"
+        sudo useradd -m -s /bin/bash "$user"
 
         echo "adding user $user..."
 
@@ -449,7 +449,7 @@ for user in "${users[@]}"; do
 
         # Set the generated password for the user by passing in the user and generated password into the chpasswd command using a pipe
 
-        echo "$user:$password" | chpasswd
+        echo "$user:$password" | sudo chpasswd
 
         #if the directory for the user in the list doesn't exist. then I create it
         #by using -u I run the mkdir command and  chmod command with the user's privileges
@@ -457,8 +457,8 @@ for user in "${users[@]}"; do
 
         if [ ! -d "/home/$user/.ssh" ]; then
 
-            -u "$user" mkdir "/home/$user/.ssh"
-            -u "$user" chmod 700 "/home/$user/.ssh"
+            sudo -u "$user" mkdir "/home/$user/.ssh"
+            sudo -u "$user" chmod 700 "/home/$user/.ssh"
 
         fi
 
@@ -471,7 +471,7 @@ for user in "${users[@]}"; do
             #to create the key. -q makes the creation of the key silent and -N quotes makes the creation of the 
             #key to not require a password so my script will just run with no interuptions.
 
-            -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
+            sudo -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
 
         fi
 
@@ -485,7 +485,7 @@ for user in "${users[@]}"; do
             #being /home/user/.ssh/id_ed25519. Then using -q to make the key creation silent/quiet to the output. I then 
             #use -N quotes to make the passphrase requirement empty for key creation.
 
-            -u "$user" ssh-keygen -t ed25519 -f "/home/$user/.ssh/id_ed25519" -q -N ""
+            sudo -u "$user" ssh-keygen -t ed25519 -f "/home/$user/.ssh/id_ed25519" -q -N ""
 
         fi
 
@@ -499,8 +499,8 @@ for user in "${users[@]}"; do
         #Meaning all of the directories, subdirectiories, and files will have the ownership changed to the user.
         #Using chmod 600 I am setting the user to have read and write permissions to authorized_keys
 
-        chown -R "$user:$user" "/home/$user/.ssh"
-        chmod 600 "/home/$user/.ssh/authorized_keys"
+        sudo chown -R "$user:$user" "/home/$user/.ssh"
+        sudo chmod 600 "/home/$user/.ssh/authorized_keys"
 
         echo "User '$user' created successfully."
         echo "Password for '$user' is: $password"
@@ -521,7 +521,7 @@ for user in "${users[@]}"; do
 
         #by using the usermod command with option -aG command I am adding dennis to the sudo group
 
-        usermod -aG sudo dennis
+        sudo usermod -aG sudo dennis
 
         #using ! -d the if statement is checking if the directory /home/user/.ssh does not exist. If it doesn't exist then run the block of code 
 
@@ -530,8 +530,8 @@ for user in "${users[@]}"; do
             #creates a directory called /home/user/.ssh using the users privileges
             #then chmod 700 will give read, write, and execute to the user for .ssh
 
-            -u "$user" mkdir "/home/$user/.ssh"
-            -u "$user" chmod 700 "/home/$user/.ssh"
+            sudo -u "$user" mkdir "/home/$user/.ssh"
+            sudo -u "$user" chmod 700 "/home/$user/.ssh"
 
         fi
 
@@ -544,7 +544,7 @@ for user in "${users[@]}"; do
             #I then use -f for file to specify where to create the key. -q makes the creation of the key silent 
             #and -N quotes makes the creation of the key passwordless.
 
-            -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
+            sudo -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""
 
             #if the ssh keygen command worked due to ahving a exit status of 0 meaning success
             #then display text the key was made for dennis
@@ -565,7 +565,7 @@ for user in "${users[@]}"; do
             #being /home/user/.ssh/id_ed25519. To make my output silent I used option -q for quiet. I then
             #make the password requirement empty using a -N with empty quotes.
 
-            -u "$user" ssh-keygen -t ed25519 -f "/home/$user/.ssh/id_ed25519" -q -N ""
+            sudo -u "$user" ssh-keygen -t ed25519 -f "/home/$user/.ssh/id_ed25519" -q -N ""
 
             #If the key creation was a success then the if statement will execute as the exit status will be equal to 0
 
@@ -628,11 +628,11 @@ new_netplan="/etc/netplan/new_netplan_config.yaml"
 #After creating a netplan config and a new netplan file, I then pipe my output of my echo config command into the tee command
 #which will write the echo contents into my new_netplan file.
 
-echo "$config" | tee "$new_netplan" > /dev/null
+echo "$config" | sudo tee "$new_netplan" > /dev/null
 
 #I am then applying my netplan settings to the system and discarding my outputs of the command to /dev/null
 
-netplan apply &> /dev/null
+sudo netplan apply &> /dev/null
 
 #if the netplan apply command works then the exit status will result to 0 which runs my if statement displaying netplan applied
 

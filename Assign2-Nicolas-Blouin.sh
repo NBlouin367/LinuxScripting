@@ -20,7 +20,7 @@
 
 if [ "$EUID" -ne 0 ]; then
 
-  echo "This script must be run as sudo/root. Either be root user or use sudo in front of your command to ensure it runs." >&2
+  echo "This script must be run as sudo/root. Either be root user or use sudo with the command to ensure it runs correctly." >&2
 
   exit 1
 

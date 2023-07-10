@@ -4,7 +4,7 @@
 #Name: Nicolas Blouin
 #Student ID: 200410446
 #Course Code: COMP2137
-#Due Date: July 12th
+#Due Date: Wednesday, July 12th, 2023
 
 
 #Script Description:
@@ -451,8 +451,8 @@ for user in "${users[@]}"; do
 
         echo "$user:$password" | sudo chpasswd
 
-        #if the directory for the user in the list doesn't exist. then I create it
-        #by using -u I run the mkdir command and  chmod command with the user's privileges
+        #if the directory for the user in the list doesn't exist. then I create it.
+        #by using -u I run the mkdir command and chmod command with the user's privileges
         #I then set permissions so the user can access the directory without issues
 
         if [ ! -d "/home/$user/.ssh" ]; then

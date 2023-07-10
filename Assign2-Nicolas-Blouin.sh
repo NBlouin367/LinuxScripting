@@ -4,6 +4,7 @@
 #Name: Nicolas Blouin
 #Student ID: 200410446
 #Course Code: COMP2137
+#Due Date: July 12th
 
 
 #Script Description:

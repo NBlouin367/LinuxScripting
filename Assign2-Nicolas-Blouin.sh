@@ -11,15 +11,24 @@
 #network settings, software installation, firewall altering, and lastly user accounts.
 #This script will change specific files within the system using sequences of commands and condition tests.
 
+#I am using an if statement to check whether or not the person trying to run the script
+#is running with root privileges. By using the environment variable $EUID I am able to check effective user ID of the current user.
+#When the current user ID when running the script is not equal to 0 meaning root I display an error message and
+#exit 1 will terminate my script. the user ID needs to be a 0 to pass this check and
+#run the remainder of my script. Using >&2 I am redirecting my echo message the output of errors.
+
 if [ "$EUID" -ne 0 ]; then
-  echo "This script must be run as a super user. Use sudo infront of your command" &> /dev/null
+
+  echo "This script must be run as a super user. Use sudo infront of your command to make sure it runs" >&2
+
   exit 1
+
 fi
 
 #This if statement takes the hostname variable of the system and compares
 #it to the string autosrv using the != I specify if it is not equal to then run the code in this block
 #I then echo the name autosrv into the hostname file on the system to persist it through rebooting
-#then I set the host name using hostnamectl 
+#then I set the host name using hostnamectl
 
 if [[ $(hostname) != "autosrv" ]]; then
 

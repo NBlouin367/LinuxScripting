@@ -84,6 +84,14 @@ if [ $? -ne 0 ]; then
 
         echo "openssh install complete."
 
+    #Using an else statement. This will handle an error. If the previous if statement checking exit status was not 
+    #0 meaning success this else is then run and I use exit 1 to terminate the script with an error message.
+
+    else
+
+        echo "openssh failed to install. Stopping script"
+        exit 1
+
     fi
 
     echo "Configuring SSH settings."
@@ -101,6 +109,13 @@ if [ $? -ne 0 ]; then
 
         echo "Password authentication settings applied."
 
+    #Using an else I am handling an error if the previous if statement did not trigger this else if ran.
+    #I just mention the settings failed to apply
+
+    else
+
+        echo "Password authentication setting could NOT be applied."
+
     fi
 
     echo "Setting SSH key authentication to YES"
@@ -115,6 +130,12 @@ if [ $? -ne 0 ]; then
     if [ $? -eq 0 ]; then
 
         echo "SSH Key authentication settings set successfully."
+
+    #If the previous if statement didn't go run then this else is ran. Displaying an error message.
+
+    else
+
+        echo "SSH Key authentication settings could NOT be applied."
 
     fi
 
@@ -274,7 +295,7 @@ else
 fi
 
 #using dpkg -s to check the staus of squid to see if it is installed or not. when the exit status is anything but a 0
-#the if statment will trigger which will install squid as it is not on the system.
+#the if statment below will trigger which will install squid as it is not on the system.
 
 dpkg -s squid &> /dev/null
 
@@ -293,6 +314,14 @@ if [ $? -ne 0 ]; then
     if [ $? -eq 0 ]; then
 
         echo "Squid installed."
+
+    #Using an else statement I can stop the script if the previous command failed meaning the exit status was not equal to 0.
+    #so it will run the else instead. Using exit 1 it will terminate the script if the script reads this portion of my code.
+
+    else
+
+        echo "Squid failed to install. Stopping the script"
+        exit 1
 
     fi
 
@@ -360,6 +389,48 @@ else
         echo "Squid setup complete."
 
     fi
+
+fi
+
+#Using dpkg -s I can check the install status of apg which is the automated password generator package. I redirect this
+#command output to /dev/null so no unnecessary output is displayed.
+
+dpkg -s apg &> /dev/null
+
+#Using an if statement I am checking if the exit status of the last command is not equal to 0. If the previous command dpkg -s apg
+#which was checking the install status evaulated to anything but a 0 this would mean the package is not installed and would run
+#this if statement.
+
+if [ $? -ne 0 ]; then
+
+    echo "Automated Password Generator - apg is not installed on the system."
+    echo "agp is needed for certain commands in this script."
+    echo "Installing Automated Password Generator..."
+
+    #Here I am installing the automated password generator - apg package with the -y option to automatically say yes to all prompts.
+    #I redirect the output of the command to /dev/null to make sure unnecessary information is not included in the output.
+
+    apt-get install -y apg > /dev/null
+
+    #If the previous command installing apg had an exit status of 0 then that would mean success and this if will run
+    #displaying that apg was installed.
+
+    if [ $? -eq 0]; then
+
+        echo "Automated Password Generator was installed successfully."
+
+    else
+
+        echo "Failed to install Automated Password Generator"
+        exit 1
+
+    fi
+
+#If the above if statement didn't run then the else statement is then triggered. This would mean the package is already installed.
+
+else
+
+    echo "Automated Password Generator is already installed."
 
 fi
 

@@ -89,7 +89,7 @@ if [ $? -ne 0 ]; then
 
     else
 
-        echo "openssh failed to install. Stopping script"
+        echo "openssh failed to install. Terminating Script"
         exit 1
 
     fi
@@ -137,7 +137,7 @@ if [ $? -ne 0 ]; then
 
     else
 
-        echo "SSH Key authentication settings could NOT be applied. Stopping Script"
+        echo "SSH Key authentication settings could NOT be applied. Stopping script"
         exit 1
 
     fi
@@ -159,7 +159,7 @@ if [ $? -ne 0 ]; then
 
     else
 
-        echo "Failed to restart SSH and complete the setup. Stopping Script."
+        echo "Failed to restart SSH and complete the setup. Exiting Script."
         exit 1
 
     fi
@@ -214,7 +214,7 @@ else
 
     else
 
-        echo "SSH Key authentication was NOT setup correctly. Stopping the script."
+        echo "SSH Key authentication was NOT setup correctly. Exiting Script."
         exit 1
 
     fi
@@ -258,11 +258,19 @@ if [ $? -ne 0 ]; then
 
     apt-get install -y apache2 > /dev/null
 
-    #if the install worked then exit status 0 will execute this if block saying installed.
+    #if the install worked then the produced exit status of 0 will execute this if block saying installed.
 
     if [ $? -eq 0 ]; then
 
         echo "Installed Apache2."
+
+    #When the previous if statement does not execute this else is ran to handle any errors. I display an error message.
+    #I also terminate the script using exit 1
+
+    else
+
+        echo "Apache 2 was NOT installed correctly. terminating script"
+        exit 1
 
     fi
 
@@ -276,7 +284,15 @@ if [ $? -ne 0 ]; then
 
     if [ $? -eq 0 ]; then
 
-        echo "config enabled successfully."
+        echo "Apache2 config enabled successfully."
+
+    #By using an else I handle errors when the exit status is not 0. Since my previous if did not run there must have been an error.
+    #I then display and error message and terminate the script by using exit 1.
+
+    else
+
+        echo "Apache2 config failed to enable. Stopping Script."
+        exit 1
 
     fi
 
@@ -292,6 +308,14 @@ if [ $? -ne 0 ]; then
 
         echo "Apache setup complete."
 
+    #Using an else I am able to handle errors whenever my previous if statement did not execute as that would have checked succession.
+    #I then display an error and terminate the script using exit 1.
+
+    else
+
+        echo "Apache Restart and setup has failed. Exiting Script."
+        exit 1
+
     fi
 
 #If the previous dpkg if statement did not execute then run this else
@@ -305,11 +329,19 @@ else
 
     a2enmod ssl > /dev/null
 
-    #if this enabled command worked then run this if statement saying success
+    #if this enabled command worked then run this if statement saying success as the exit status was a 0
 
     if [ $? -eq 0 ]; then
 
         echo "Apache settings applied successfully."
+
+    #Using an else I handle potential errors whenever my previous if statement did not execute as that would have checked succession.
+    #I then display an error and terminate the script using exit 1.
+
+    else
+
+        echo "Apache settings could NOT apply successfully. Terminating the Script."
+        exit 1
 
     fi
 
@@ -324,6 +356,14 @@ else
     if [ $? -eq 0 ]; then
 
         echo "Apache setup complete."
+
+    #when my if statement does not execute that will mean the exit status of the previous command failed. I can then use an else
+    #to handle this error. I then display an error and terminate the script using exit 1.
+
+    else
+
+        echo "Apache Restart and setup failed. Stopping Script"
+        exit 1
 
     fi
 
@@ -350,12 +390,12 @@ if [ $? -ne 0 ]; then
 
         echo "Squid installed."
 
-    #Using an else statement I can stop the script if the previous command failed meaning the exit status was not equal to 0.
-    #so it will run the else instead. Using exit 1 it will terminate the script if the script reads this portion of my code.
+    #Using an else I can stop the script if the previous command failed meaning the exit status was not equal to 0.
+    #so it will run the else instead. Using exit 1 it will terminate the script.
 
     else
 
-        echo "Squid failed to install. Stopping the script"
+        echo "Squid failed to install. Exiting the script"
         exit 1
 
     fi
@@ -374,6 +414,14 @@ if [ $? -ne 0 ]; then
 
         echo "Squid settings applied."
 
+    #Using an else I will be able to exit the script when my if statement did not execute which would have check succession.
+    #I display an error and then use exit 1 to terminate the script.
+
+    else
+
+        echo "Squid settings could NOT apply properly. Stopping Script."
+        exit 1
+
     fi
 
     echo "Restarting Squid..."
@@ -387,6 +435,14 @@ if [ $? -ne 0 ]; then
     if [ $? -eq 0 ]; then
 
         echo "Squid setup complete."
+
+    #Including an else to handle errors. When my previous if statement does not execute this else will go off
+    #and display an error message as well as terminate my script using exit 1
+
+    else
+
+        echo "Squid Restart and setup failure. Quitting Script"
+        exit 1
 
     fi
 
@@ -409,6 +465,14 @@ else
 
         echo "Squid was setup correctly."
 
+    #I use an else here to handle any potential errors when my previous if statement does not execute. I display an error message
+    #and then exit the script using exit 1
+
+    else
+
+        echo "Squid was NOT configured properly. Terminating Script"
+        exit 1
+
     fi
 
     echo "Squid is restarting..."
@@ -422,6 +486,14 @@ else
     if [ $? -eq 0 ]; then
 
         echo "Squid setup complete."
+
+    #Using an else I can manage any errors if my previous if statement did not execute this would pose an error that occured. 
+    #I then display an error message and terminate the script using exit 1
+
+    else
+
+        echo "Squid restart and setup failed. Terminating script"
+        exit 1
 
     fi
 

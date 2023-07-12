@@ -4,8 +4,7 @@
 #Name: Nicolas Blouin
 #Student ID: 200410446
 #Course Code: COMP2137
-#Due Date: Wednesday, July 12th, 2023
-
+#Due Date: Wednesday, July 12th, 2023.
 
 #Script Description:
 #The purpose of my script is to alter the system configuration. This includes the system hostname,
@@ -76,11 +75,11 @@ if [ $? -ne 0 ]; then
 
     echo "Installing SSH server..."
 
-    #installing openssh-server using the -y option just automatically assumes yes for all the install prompts
+    #installing openssh-server using the -y option just automatically assumes yes for all the install prompts.
 
     apt-get install -y openssh-server > /dev/null
 
-    #when the exit status of the previous command is 0 meaning success run this if statment saying ssh install complete
+    #when the exit status of the previous command is 0 meaning success run this if statment saying ssh install complete.
 
     if [ $? -eq 0 ]; then
 

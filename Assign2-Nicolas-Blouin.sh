@@ -41,15 +41,17 @@ if [[ $(hostname) != "autosrv" ]]; then
 
     if [ $? -eq 0 ]; then
 
-       echo "Hostname has been changed!"
+        echo "Hostname has been changed!"
 
-    fi
+    #By using an else I can make sure I handle errors. When the condition of my previous if statement is not met the else will run.
+    #Since my if statement above was checking if exit status of the hostnamectl command was equal to 0 meaning success
+    #then any failures/outcomes would result in this else being executed. I display an error and then using exit 1
+    #I terminate the script.
 
-    #if the exit status not equal to 0 meaning unsuccessful then display it failed
+    else
 
-    if [ $? -ne 0 ]; then
-
-       echo "Hostname change failed!"
+        echo "Attempt to change the hostname failed. Exiting Script"
+        exit 1
 
     fi
 
@@ -487,7 +489,7 @@ else
 
         echo "Squid setup complete."
 
-    #Using an else I can manage any errors if my previous if statement did not execute this would pose an error that occured. 
+    #Using an else I can manage any errors if my previous if statement did not execute this would pose an error that occured.
     #I then display an error message and terminate the script using exit 1
 
     else
@@ -522,7 +524,7 @@ if [ $? -ne 0 ]; then
     #If the previous command installing apg had an exit status of 0 then that would mean success and this if will run
     #displaying that apg was installed.
 
-    if [ $? -eq 0]; then
+    if [ $? -eq 0 ]; then
 
         echo "Automated Password Generator was installed successfully."
 
@@ -551,47 +553,81 @@ fi
 
 if [[ $(ufw status | grep -w "Status: active") ]]; then
 
-  echo "UFW firewall is already enabled."
-  echo "Adding rules."
+     echo "UFW firewall status already active."
+     echo "Adding some tcp firewall rules on ports 22, 80, 443, and 3128."
 
-  #Will add rules anyways even if the firewall is active
-  #Setting all the ports I want to allow in the firewall configuration.
+     #Will add rules anyways even if the firewall is active
+     #Setting all the ports I want to allow in the firewall configuration.
 
-  ufw allow 22
+     ufw allow 22/tcp
 
-  ufw allow 80
+     ufw allow 80/tcp
 
-  ufw allow 443
+     ufw allow 443/tcp
 
-  ufw allow 3128
+     ufw allow 3128/tcp
 
-  #restarting the firewall to apply the new changes
+     #restarting the firewall to apply the new changes
 
-  ufw reload
+     ufw reload
+
+     #Using an if I can evaluate if the exit status of the ufw reload command was a 0 meaning a success.
+     #I then display a success message
+
+     if [ $? -eq 0 ]; then
+
+         echo "Firewall was successfully restarted"
+
+     #When the above if statement is not ran then that would mean an exit status other than 0 occured.
+     #My else statement will then execute displaying an error and I terminate the script with an exit 1.
+
+     else
+
+         echo "Firewall could NOT restart. Terminating script."
+         exit 1
+
+     fi
 
 #when the firewall is not on run the else and enable it and apply rules to allow my listed ports
 
 else
 
-  echo "Enabling UFW firewall."
+    echo "Enabling UFW firewall."
 
-  #turn on the firewall using ufw enable command
+    #turn on the firewall using ufw enable command
 
-  ufw enable
+    ufw enable
 
-  ufw allow 22
+    #If the exit status of my previous ufw enable command was 0 meaning success then run this if statement.
+    #I display a success message.
 
-  ufw allow 80
+    if [ $? -eq 0 ]; then
 
-  ufw allow 443
+        echo "Firewall was turned on successfully"
 
-  ufw allow 3128
+    #When the previous if statement does not execute that would mean that the last command failed. This command being ufw enable
+    #I then use an else to handle the error displaying a message and terminating the script using exit 1.
 
-  #restart the firewall to apply my settings
+    else
 
-  ufw reload
+        echo "Firewall failed to enable. Stopping the script"
+        exit 1
 
-  echo "Firewall turned on and setup was successful!"
+    fi
+
+    ufw allow 22/tcp
+
+    ufw allow 80/tcp
+
+    ufw allow 443/tcp
+
+    ufw allow 3128/tcp
+
+    #restart the firewall to apply my settings
+
+    ufw reload
+
+    echo "Firewall turned on and setup was successful!"
 
 fi
 
@@ -650,7 +686,7 @@ for user in "${users[@]}"; do
 
             #Then using -u I am running the command with the users privileges. I then generate an ssh key using ssh-keygen
             #using -t to specify the type of key to rsa. then -b for the bits of the key. I then use -f to specify where
-            #to create the key. -q makes the creation of the key silent and -N quotes makes the creation of the 
+            #to create the key. -q makes the creation of the key silent and -N quotes makes the creation of the
             #key to not require a password so my script will just run with no interuptions.
 
             sudo -u "$user" ssh-keygen -t rsa -b 4096 -f "/home/$user/.ssh/id_rsa" -q -N ""

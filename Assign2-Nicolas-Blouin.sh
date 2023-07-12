@@ -500,7 +500,7 @@ else
 
 fi
 
-#Using dpkg -s I can check the install status of apg which is the automated password generator package. I redirect this
+#Using dpkg -s I can check the install status of apg which is the automated password generator program. I redirect this
 #command output to /dev/null so no unnecessary output is displayed.
 
 dpkg -s apg &> /dev/null
@@ -616,6 +616,8 @@ else
 
     fi
 
+    echo "Adding a few tcp firewall rules on ports 22, 80, 443, and 3128."
+
     ufw allow 22/tcp
 
     ufw allow 80/tcp
@@ -626,7 +628,7 @@ else
 
     echo "Restarting firewall"
 
-    #restart the firewall to apply my setting using the ufw reload command
+    #restart the firewall to apply my settings using the ufw reload command
 
     ufw reload
 
@@ -652,7 +654,7 @@ else
 fi
 
 
-#Creating my list of users to make on the system per assignment requirements
+#Creating my list of users to add onto the system per assignment requirements
 
 users=("dennis" "aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
 

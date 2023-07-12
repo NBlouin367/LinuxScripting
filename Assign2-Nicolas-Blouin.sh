@@ -526,9 +526,13 @@ if [ $? -ne 0 ]; then
 
         echo "Automated Password Generator was installed successfully."
 
+    #I have included an else to make sure if my previous if statement checking command succession does not execute then this
+    #else will handle the error as the exit status of the apg install was not equal to 0 so it runs my else. I display an error
+    #message and then terminate the script using exit 1
+
     else
 
-        echo "Failed to install Automated Password Generator"
+        echo "Failed to install Automated Password Generator. Going to exit script"
         exit 1
 
     fi

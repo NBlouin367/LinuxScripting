@@ -84,7 +84,7 @@ if [ $? -ne 0 ]; then
 
         echo "openssh install complete."
 
-    #Using an else statement. This will handle an error. If the previous if statement checking exit status was not 
+    #Using an else statement. This will handle an error. If the previous if statement checking exit status was not
     #0 meaning success this else is then run and I use exit 1 to terminate the script with an error message.
 
     else
@@ -110,11 +110,12 @@ if [ $? -ne 0 ]; then
         echo "Password authentication settings applied."
 
     #Using an else I am handling an error if the previous if statement did not trigger this else if ran.
-    #I just mention the settings failed to apply
+    #I just mention the settings failed to apply and then exit 1 to terminate the script from running.
 
     else
 
-        echo "Password authentication setting could NOT be applied."
+        echo "Password authentication setting could NOT be applied. Stopping Script."
+        exit 1
 
     fi
 
@@ -125,17 +126,19 @@ if [ $? -ne 0 ]; then
 
     sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config
 
-    #if the previous command was successful then the if statement will run due to exit status 0 
+    #if the previous command was successful then the if statement will run due to exit status 0
 
     if [ $? -eq 0 ]; then
 
         echo "SSH Key authentication settings set successfully."
 
-    #If the previous if statement didn't go run then this else is ran. Displaying an error message.
+    #If the previous if statement did not run then this else is ran. Displaying an error message.
+    #I terminate the script using exit 1
 
     else
 
-        echo "SSH Key authentication settings could NOT be applied."
+        echo "SSH Key authentication settings could NOT be applied. Stopping Script"
+        exit 1
 
     fi
 
@@ -150,6 +153,14 @@ if [ $? -ne 0 ]; then
     if [ $? -eq 0 ]; then
 
         echo "SSH Setup complete."
+
+    #if the previous if statement did not trigger then this else is ran.
+    #I display an error message and terminate the script with exit 1.
+
+    else
+
+        echo "Failed to restart SSH and complete the setup. Stopping Script."
+        exit 1
 
     fi
 
@@ -175,6 +186,14 @@ else
 
         echo "Password authentication set correctly."
 
+    #I use an else to handle an error. If the previous if statement did not execute then the else is ran
+    #I display an error message and then terminate the script using exit 1.
+
+    else
+
+        echo "Password authentication was NOT successful. Stopping the Script."
+        exit 1
+
     fi
 
     echo "Setting SSH key authentication to YES"
@@ -190,6 +209,14 @@ else
 
         echo "SSH key authentication set correctly."
 
+    #If the previous if statment did not execute then this else is ran. I did this to handle the errors.
+    #I display an error message and then terminate the script using exit 1.
+
+    else
+
+        echo "SSH Key authentication was NOT setup correctly. Stopping the script."
+        exit 1
+
     fi
 
     echo "Restarting SSH..."
@@ -203,6 +230,14 @@ else
     if [ $? -eq 0 ]; then
 
         echo "SSH setup Complete."
+
+    #using the else statement I handle the error of when the exit status of the restart command above failed meaning not a 0.
+    #I display an error and terminate the script using exit 1.
+
+    else
+
+        echo "SSH Restart and setup failed. Stopping Script."
+        exit 1
 
     fi
 fi

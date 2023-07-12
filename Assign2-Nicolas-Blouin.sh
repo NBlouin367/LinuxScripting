@@ -566,7 +566,9 @@ if [[ $(ufw status | grep -w "Status: active") ]]; then
 
      ufw allow 3128/tcp
 
-     #restarting the firewall to apply the new changes
+     echo "Restarting/Reloading the firewall"
+
+     #restarting the firewall to apply the new changes using the ufw reload command.
 
      ufw reload
 
@@ -575,7 +577,7 @@ if [[ $(ufw status | grep -w "Status: active") ]]; then
 
      if [ $? -eq 0 ]; then
 
-         echo "Firewall was successfully restarted"
+         echo "Firewall was successfully Restarted/Reloaded."
 
      #When the above if statement is not ran then that would mean an exit status other than 0 occured.
      #My else statement will then execute displaying an error and I terminate the script with an exit 1.
@@ -591,7 +593,7 @@ if [[ $(ufw status | grep -w "Status: active") ]]; then
 
 else
 
-    echo "Enabling UFW firewall."
+    echo "Turning on UFW firewall."
 
     #turn on the firewall using ufw enable command
 
@@ -602,14 +604,14 @@ else
 
     if [ $? -eq 0 ]; then
 
-        echo "Firewall was turned on successfully"
+        echo "Firewall was turned on successfully."
 
     #When the previous if statement does not execute that would mean that the last command failed. This command being ufw enable
     #I then use an else to handle the error displaying a message and terminating the script using exit 1.
 
     else
 
-        echo "Firewall failed to enable. Stopping the script"
+        echo "Firewall failed to enable and turn on. Stopping the script"
         exit 1
 
     fi
@@ -622,9 +624,28 @@ else
 
     ufw allow 3128/tcp
 
-    #restart the firewall to apply my settings
+    echo "Restarting firewall"
+
+    #restart the firewall to apply my setting using the ufw reload command
 
     ufw reload
+
+    #Using an if to check if the exit status of my ufw reload command was a 0 meaning success. If a 0 then run this if statement.
+
+    if [ $? -eq 0 ]; then
+
+        echo "Firewall restarted successfully."
+
+    #When the above if statement is not executed then the exit status of ufw reload was something other than a 0.
+    #My else statement will then execute displaying an error and I terminate the script with an exit 1.
+
+    else
+
+        echo "Firewall could NOT restart properly. Terminating script"
+        exit 1
+
+    fi
+
 
     echo "Firewall turned on and setup was successful!"
 
@@ -856,5 +877,13 @@ sudo netplan apply &> /dev/null
 if [ $? -eq 0 ]; then
 
     echo "Netplan configuration was applied!"
+
+#When my if statement above checking if the netplan apply command had an exit status of 0 meaning successful does not evaluate then
+#my else would then be executed displaying an error message and I terminate the script using exit 1
+
+else
+
+    echo "Netplan configuration failed"
+    exit 1
 
 fi

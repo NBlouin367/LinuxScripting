@@ -125,7 +125,7 @@ fi
 #if the phrase Status: active appears in the ufw status output then the if block runs.
 
 
-if [ ufw status | grep -w -q "Status: active" ]; then
+if [ "$(ufw status | grep -w -q "Status: active")" ]; then
 
      echo "UFW firewall status already active."
      echo "Adding firewall rules."
@@ -257,3 +257,11 @@ echo "end of file hit"
 EOF
 
 echo "ssh exited got out of EOF"
+
+exit
+
+if [ $? -eq 0 ]; then
+
+    echo "Successfully closed SSH session"
+
+fi

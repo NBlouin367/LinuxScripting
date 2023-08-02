@@ -18,7 +18,7 @@ fi
 target1_username="remoteadmin"
 target1_ip="172.16.1.10"
 
-ssh $target1_username@$target1_ip << EOF
+ssh -o "StrictHostKeyChecking=no" -q $target1_username@$target1_ip << EOF
 
 echo "Going to configure target1-mgmt (172.16.1.10)"
 
@@ -99,6 +99,7 @@ if [ $? -ne 0 ]; then
 
     echo "UFW is not installed."
     echo "Going to install UFW"
+
     sudo apt-get install -y ufw > /dev/null
 
 
@@ -124,7 +125,7 @@ fi
 #if the phrase Status: active appears in the ufw status output then the if block runs.
 
 
-if [ ufw status | grep -w "Status: active" ]; then
+if [ ufw status | grep -w -q "Status: active" ]; then
 
      echo "UFW firewall status already active."
      echo "Adding firewall rules."
@@ -235,6 +236,8 @@ fi
 
 
 #Restart rsyslog
+
+echo "Restarting rsyslog..."
 
 systemctl restart rsyslog
 

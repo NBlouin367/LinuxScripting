@@ -15,9 +15,10 @@ if [ "$EUID" -ne 0 ]; then
 
 fi
 
-target1_management="remoteadmin@172.16.1.0"
+target1_username="remoteadmin"
+target1_ip="172.16.1.10"
 
-ssh "$target1_management" << EOF
+ssh $target1_username@$target1_ip << EOF
 
 echo "Going to configure target1-mgmt (172.16.1.10)"
 
@@ -98,10 +99,10 @@ if [ $? -ne 0 ]; then
 
     echo "UFW is not installed."
     echo "Going to install UFW"
-    apt-get install -y ufw > /dev/null
+    sudo apt-get install -y ufw > /dev/null
 
 
-    if [ $? -eq 0  ]; then
+    if [ $? -eq 0 ]; then
 
         echo "Successfull installed UFW"
 
@@ -122,7 +123,8 @@ fi
 #to search for the pattern of Status: active. By using -w the grep command will do a whole word search.
 #if the phrase Status: active appears in the ufw status output then the if block runs.
 
-if [[ $(ufw status | grep -w "Status: active") ]]; then
+
+if [ ufw status | grep -w "Status: active" ]; then
 
      echo "UFW firewall status already active."
      echo "Adding firewall rules."
@@ -130,7 +132,7 @@ if [[ $(ufw status | grep -w "Status: active") ]]; then
      #Will add rules anyways even if the firewall is active
      #Setting all the ports I want to allow in the firewall configuration.
 
-     ufw allow from 172.16.1.0/24 to any port 514/udp
+     ufw allow proto udp from 172.16.1.0/24 to any port 514
 
      echo "Restarting/Reloading the firewall"
 
@@ -163,7 +165,7 @@ else
 
     #turn on the firewall using ufw enable command
 
-    ufw enable
+    ufw --force enable
 
     #If the exit status of my previous ufw enable command was 0 meaning success then run this if statement.
     #I display a success message.
@@ -184,7 +186,7 @@ else
 
     echo "Adding a few tcp firewall rules."
 
-    ufw allow from 172.16.1.0/24 to any port 514/udp
+    ufw allow proto udp from 172.16.1.0/24 to any port 514
 
     echo "Restarting firewall"
 
@@ -247,5 +249,8 @@ else
 
 fi
 
+echo "end of file hit"
+
 EOF
 
+echo "ssh exited got out of EOF"

@@ -24,7 +24,7 @@ echo "Going to configure target1-mgmt (172.16.1.10)"
 
 if [[ $(hostname) != "loghost" ]]; then
 
-    echo "Updating the system name to loghost"
+    echo "Updating the hostname to loghost"
     echo "loghost" > /etc/hostname
     hostnamectl set-hostname loghost
 
@@ -58,10 +58,39 @@ fi
 
 #Setting IP address on on management 1
 
+echo "Setting IP address to host 3 on the LAN"
+
 ip addr add 192.168.1.3/24 dev eth0
+
+if [ $? -eq 0 ]; then
+
+    echo "Successfully set IP to host number 3: IP address 192.168.1.3/24"
+
+else
+
+    echo "IP could not be setup correctly. Terminating script"
+    exit 1
+
+fi
+
+#Adding machine webhost to /etc/hosts
+
+echo "Adding machine webhost to /etc/hosts"
+
 echo "192.168.1.4 webhost" | sudo tee -a /etc/hosts
 
-#Checking if ufw installed
+if [ $? -eq 0 ]; then
+
+    echo "Successfully added machine webhost"
+
+else
+
+    echo "Failed to add webhost. Exiting Script."
+    exit 1
+
+fi
+
+#Checking if ufw is installed
 
 dpkg -s ufw &> /dev/null
 
@@ -187,7 +216,36 @@ fi
 #Rsyslog stuff
 
 sed -i 's/#module(load="imudp")/module(load="imudp")/' /etc/rsyslog.conf
+
+if [ $? -eq 0 ]; then
+
+    echo "Successfully uncommented lines."
+
+fi
+
 sed -i 's/#input(type="imudp" port="514")/input(type="imudp" port="514")/' /etc/rsyslog.conf
+
+if [ $? -eq 0 ]; then
+
+    echo "Successfully uncommented lines to enable UDP listening on port 514"
+
+fi
+
+
+#Restart rsyslog
+
+systemctl restart rsyslog
+
+if [ $? -eq 0 ]; then
+
+    echo "Succesfully restarted rsyslog"
+
+else
+
+    echo "Could not restart rsyslog. Exiting script"
+    exit 1
+
+fi
 
 EOF
 

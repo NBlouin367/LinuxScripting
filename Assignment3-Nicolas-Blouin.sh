@@ -18,7 +18,7 @@ fi
 target1_username="remoteadmin"
 target1_ip="172.16.1.10"
 
-ssh -o "StrictHostKeyChecking=no" -q $target1_username@$target1_ip << EOF
+ssh -o "StrictHostKeyChecking=no" -q -t $target1_username@$target1_ip << EOF
 
 echo "Going to configure target1-mgmt (172.16.1.10)"
 
@@ -252,12 +252,6 @@ else
 
 fi
 
-echo "end of file hit"
-
-EOF
-
-echo "ssh exited got out of EOF"
-
 exit
 
 if [ $? -eq 0 ]; then
@@ -265,3 +259,10 @@ if [ $? -eq 0 ]; then
     echo "Successfully closed SSH session"
 
 fi
+
+
+echo "end of file hit"
+
+EOF
+
+

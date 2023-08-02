@@ -6,7 +6,7 @@
 #Course Code: COMP2137
 #Due Date: Wednesday, August 4th, 2023.
 
-
+#user id check
 if [ "$EUID" -ne 0 ]; then
 
   echo "This script must be run as sudo/root. Either be root user or use sudo with the command to ensure it runs correctly." >&2

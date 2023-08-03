@@ -622,3 +622,31 @@ fi
 
 
 #need to change NMS host file next
+
+sed -i '/\(loghost\|webhost\)/d' /etc/hosts
+
+echo "192.168.1.3 loghost" | sudo tee -a /etc/hosts
+
+if [ $? -eq 0 ]; then
+
+    echo "Successfully added 192.168.1.3 loghost to /etc/hosts"
+
+else
+
+    echo "Failed to add 192.168.1.3 loghost to /etc/hosts"
+
+fi
+
+echo "192.168.1.4 webhost" | sudo tee -a /etc/hosts
+
+if [ $? -eq 0 ]; then
+
+    echo "Successfully added 192.168.1.4 loghost to /etc/hosts"
+
+else
+
+    echo "Failed to add 192.168.1.4 loghost to /etc/hosts"
+
+fi
+
+echo "END OF SCRIPT"

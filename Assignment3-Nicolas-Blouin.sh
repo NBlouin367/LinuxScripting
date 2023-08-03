@@ -505,3 +505,46 @@ if ssh "$target2_management" << EOF
 
    fi
 
+   dpkg -s apache2 &> /dev/null
+
+   if [ $? -ne 0 ]; then
+
+       echo "Apache2 is not installed."
+       echo "Going to install Apache2."
+
+       sudo apt-get install -y ufw > /dev/null
+
+
+       if [ $? -eq 0 ]; then
+
+           echo "Successfull installed Apache2"
+
+       else
+
+           echo "Apache Install failed! Terminating the script"
+           exit 1
+
+       fi
+
+   else
+
+       echo "Apache is already installed."
+
+   fi
+
+   echo "*.* @loghost" | sudo tee -a /etc/rsyslog.conf
+
+EOF
+
+then
+
+    echo "Target2 settings were updated successfully. No error exit status codes frmo previous commands."
+
+else
+
+    echo "Target2 settings failed to configure correctly. Exiting Script"
+    exit 1
+
+fi
+
+

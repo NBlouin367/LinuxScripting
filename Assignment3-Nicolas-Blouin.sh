@@ -534,11 +534,21 @@ if ssh "$target2_management" << EOF
 
    echo "*.* @loghost" | sudo tee -a /etc/rsyslog.conf
 
+   if [ $? -eq 0 ]; then
+
+       echo "*.* @loghost added to /etc/rsyslog.conf success"
+
+   else
+
+       echo "Failed to add *.* @loghost to /etc/rsyslog.conf"
+
+   fi
+
 EOF
 
 then
 
-    echo "Target2 settings were updated successfully. No error exit status codes frmo previous commands."
+    echo "Target2 settings were updated successfully. No error exit status codes from previous commands."
 
 else
 

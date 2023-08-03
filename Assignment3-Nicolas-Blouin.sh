@@ -16,6 +16,10 @@ if [ "$EUID" -ne 0 ]; then
 
 fi
 
+echo "Updating package list, so packages install correctly"
+
+apt update > /dev/dell
+
 echo "Checking if SSH is installed before proceeding"
 
 dpkg -s openssh-server &> /dev/null
@@ -95,7 +99,7 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    echo "Setting IP address to host 3 on the LAN"
 
-   ip addr add 192.168.1.3/24 dev eth0
+   ip addr add 172.16.1.3/24 dev eth0
 
    if [ $? -eq 0 ]; then
 
@@ -378,7 +382,7 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    echo "Setting IP address to host 4 on the LAN"
 
-   ip addr add 192.168.1.4/24 dev eth0
+   ip addr add 172.16.1.4/24 dev eth0
 
    if [ $? -eq 0 ]; then
 
@@ -611,26 +615,26 @@ echo "Configuring NMS Settings..."
 
 sed -i '/\(loghost\|webhost\)/d' /etc/hosts
 
-echo "192.168.1.3 loghost" | sudo tee -a /etc/hosts
+echo "172.16.1.3 loghost" | sudo tee -a /etc/hosts
 
 if [ $? -eq 0 ]; then
 
-    echo "Successfully added 192.168.1.3 loghost to /etc/hosts"
+    echo "Successfully added 172.16.1.3 loghost to /etc/hosts"
 
 else
 
-    echo "Failed to add 192.168.1.3 loghost to /etc/hosts"
+    echo "Failed to add 172.16.1.3 loghost to /etc/hosts"
 
 fi
 
-echo "192.168.1.4 webhost" | sudo tee -a /etc/hosts
+echo "172.16.1.4 webhost" | sudo tee -a /etc/hosts
 
 if [ $? -eq 0 ]; then
 
-    echo "Successfully added 192.168.1.4 loghost to /etc/hosts"
+    echo "Successfully added 172.16.1.4 loghost to /etc/hosts"
 
 else
 
-    echo "Failed to add 192.168.1.4 loghost to /etc/hosts"
+    echo "Failed to add 172.16.1.4 loghost to /etc/hosts"
 
 fi

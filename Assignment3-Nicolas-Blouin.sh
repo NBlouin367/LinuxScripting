@@ -560,7 +560,7 @@ fi
 
 # start of NMS Section
 
-if ssh "$target2_management" << EOF
+if ssh ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    systemctl is-active apache2 | grep -q "active"
 
@@ -589,7 +589,7 @@ else
 fi
 
 
-if ssh "$target1_management" << EOF
+if ssh ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    systemctl is-active rsyslog | grep -q "active"
 

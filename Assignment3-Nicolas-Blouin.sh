@@ -47,10 +47,8 @@ if [ $? -ne 0 ]; then
     fi
 fi
 
-target1_username="remoteadmin"
-target1_ip="172.16.1.10"
+target1_management="remoteadmin@172.16.1.10"
 
-ssh -o "StrictHostKeyChecking=no" -q -t $target1_username@$target1_ip << EOF
 
 echo "Going to configure target1-mgmt (172.16.1.10)"
 
@@ -281,14 +279,6 @@ else
 
     echo "Could not restart rsyslog. Exiting script"
     exit 1
-
-fi
-
-exit
-
-if [ $? -eq 0 ]; then
-
-    echo "Successfully closed SSH session"
 
 fi
 

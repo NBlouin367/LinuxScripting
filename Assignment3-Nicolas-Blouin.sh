@@ -105,7 +105,7 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    if [ $? -eq 0 ]; then
 
-       echo "Successfully set IP to host number 3: IP address 192.168.1.3/24"
+       echo "Successfully set IP to host number 3: IP address 172.16.1.3/24"
 
    else
 
@@ -118,7 +118,7 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    echo "Adding machine webhost to /etc/hosts"
 
-   echo "192.168.1.4 webhost" | sudo tee -a /etc/hosts
+   echo "172.16.1.4 webhost" | sudo tee -a /etc/hosts
 
    if [ $? -eq 0 ]; then
 
@@ -388,7 +388,7 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    if [ $? -eq 0 ]; then
 
-       echo "Successfully set IP to host number 4: IP address 192.168.1.4/24"
+       echo "Successfully set IP to host number 4: IP address 172.16.1.4/24"
 
    else
 
@@ -401,7 +401,7 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    echo "Adding machine loghost to /etc/hosts"
 
-   echo "192.168.1.3 loghost" | sudo tee -a /etc/hosts
+   echo "172.16.1.3 loghost" | sudo tee -a /etc/hosts
 
    if [ $? -eq 0 ]; then
 

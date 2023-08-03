@@ -168,7 +168,7 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
        #Setting all the ports I want to allow in the firewall configuration.
 
        ufw allow proto udp from 172.16.1.0/24 to any port 514
-
+       ufw allow 22/tcp
        echo "Restarting/Reloading the firewall"
 
        #restarting the firewall to apply the new changes using the ufw reload command.
@@ -222,6 +222,7 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
        echo "Adding firewall rules."
 
        ufw allow proto udp from 172.16.1.0/24 to any port 514
+       ufw allow 22/tcp
 
        echo "Restarting firewall"
 
@@ -452,6 +453,7 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
        #Setting all the ports I want to allow in the firewall configuration.
 
        ufw allow 80/tcp
+       ufw allow 22/tcp
 
        echo "Restarting/Reloading the firewall"
 
@@ -506,6 +508,7 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
        echo "Adding a few tcp firewall rules."
 
        ufw allow 80/tcp
+       ufw allow 22/tcp
 
        echo "Restarting firewall"
 
@@ -631,5 +634,3 @@ else
     echo "Failed to add 192.168.1.4 loghost to /etc/hosts"
 
 fi
-
-echo "END OF SCRIPT"

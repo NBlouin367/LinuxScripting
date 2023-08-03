@@ -158,7 +158,7 @@ if ssh "$target1_management" << EOF
    #if the phrase Status: active appears in the ufw status output then the if block runs.
 
 
-   if [ "$(ufw status | grep -w -q "Status: active")" ]; then
+   if ufw status | grep -w -q "Status: active"; then
 
        echo "UFW firewall status already active."
        echo "Adding firewall rules."
@@ -414,7 +414,7 @@ if ssh "$target2_management" << EOF
    #if the phrase Status: active appears in the ufw status output then the if block runs.
 
 
-   if [ "$(ufw status | grep -w -q "Status: active")" ]; then
+   if  ufw status | grep -w -q "Status: active"; then
 
        echo "UFW firewall status already active."
        echo "Adding firewall rules."

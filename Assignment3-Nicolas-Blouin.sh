@@ -101,11 +101,11 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    echo "Setting IP address to host 3 on the LAN"
 
-   ip addr add 172.16.1.3/24 dev eth0
+   ip addr add 192.168.16.3/24 dev eth0
 
    if [ $? -eq 0 ]; then
 
-       echo "Successfully set IP to host number 3: IP address 172.16.1.3/24"
+       echo "Successfully set IP to host number 3"
 
    else
 
@@ -118,7 +118,7 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    echo "Adding machine webhost to /etc/hosts"
 
-   echo "172.16.1.4 webhost" | sudo tee -a /etc/hosts
+   echo "198.168.16.4 webhost" | sudo tee -a /etc/hosts
 
    if [ $? -eq 0 ]; then
 
@@ -311,7 +311,7 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    if [ $? -eq 0 ]; then
 
-       echo "LOgs are being received from webhost"
+       echo "Logs are being received from webhost"
 
    else
 
@@ -322,7 +322,7 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
 
    echo "logging out of SSH Session on target 1"
-   logout
+
 
 EOF
 
@@ -384,11 +384,11 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    echo "Setting IP address to host 4 on the LAN"
 
-   ip addr add 172.16.1.4/24 dev eth0
+   ip addr add 192.168.16.4/24 dev eth0
 
    if [ $? -eq 0 ]; then
 
-       echo "Successfully set IP to host number 4: IP address 172.16.1.4/24"
+       echo "Successfully set IP to host number 4"
 
    else
 
@@ -401,7 +401,7 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    echo "Adding machine loghost to /etc/hosts"
 
-   echo "172.16.1.3 loghost" | sudo tee -a /etc/hosts
+   echo "192.168.16.3 loghost" | sudo tee -a /etc/hosts
 
    if [ $? -eq 0 ]; then
 
@@ -596,8 +596,6 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
    fi
 
 
-   logout
-
 EOF
 
 then
@@ -617,26 +615,26 @@ echo "Configuring NMS Settings..."
 
 sed -i '/\(loghost\|webhost\)/d' /etc/hosts
 
-echo "172.16.1.3 loghost" | sudo tee -a /etc/hosts
+echo "192.168.16.3 loghost" | sudo tee -a /etc/hosts
 
 if [ $? -eq 0 ]; then
 
-    echo "Successfully added 172.16.1.3 loghost to /etc/hosts"
+    echo "Successfully added loghost to /etc/hosts"
 
 else
 
-    echo "Failed to add 172.16.1.3 loghost to /etc/hosts"
+    echo "Failed to add loghost to /etc/hosts"
 
 fi
 
-echo "172.16.1.4 webhost" | sudo tee -a /etc/hosts
+echo "192.168.16.4 webhost" | sudo tee -a /etc/hosts
 
 if [ $? -eq 0 ]; then
 
-    echo "Successfully added 172.16.1.4 loghost to /etc/hosts"
+    echo "Successfully added loghost to /etc/hosts"
 
 else
 
-    echo "Failed to add 172.16.1.4 loghost to /etc/hosts"
+    echo "Failed to add loghost to /etc/hosts"
 
 fi

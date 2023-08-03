@@ -301,3 +301,81 @@ else
 
 fi
 
+#Start of target 2 commands
+
+target2_management="remoteadmin@172.16.1.11"
+
+if ssh "$target2_management" << EOF
+
+   echo "Configuring target 2 settings"
+
+   if [[ $(hostname) != "webhost" ]]; then
+
+       echo "Updating the hostname to webhost"
+       echo "webhost" > /etc/hostname
+       hostnamectl set-hostname webhost
+
+       #if the exit status is 0, the hostname change was successful then display it worked
+
+       if [ $? -eq 0 ]; then
+
+           echo "Hostname has been changed!"
+
+       #By using an else I can make sure I handle errors. When the condition of my previous if statement is not met the else will run.
+       #Since my if statement above was checking if exit status of the hostnamectl command was equal to 0 meaning success
+       #then any failures/outcomes would result in this else being executed. I display an error and then using exit 1
+       #I terminate the script.
+
+       else
+
+           echo "Attempt to change the hostname failed. Exiting Script"
+           exit 1
+
+       fi
+
+   #if the if statement condition does not execute then run the else
+   #it will just display some text saying the host name is already set up.
+
+
+   else
+
+       echo "Hostname is already set correctly."
+
+   fi
+
+
+   #Setting IP address on on management 2
+
+   echo "Setting IP address to host 4 on the LAN"
+
+   ip addr add 192.168.1.4/24 dev eth0
+
+   if [ $? -eq 0 ]; then
+
+       echo "Successfully set IP to host number 4: IP address 192.168.1.4/24"
+
+   else
+
+       echo "IP could not be setup correctly. Terminating script"
+       exit 1
+
+   fi
+
+   #Adding machine losthost to /etc/hosts
+
+   echo "Adding machine loghost to /etc/hosts"
+
+   echo "192.168.1.3 loghost" | sudo tee -a /etc/hosts
+
+   if [ $? -eq 0 ]; then
+
+       echo "Successfully added machine loghost"
+
+   else
+
+       echo "Failed to add loghost. Exiting Script."
+       exit 1
+
+   fi
+
+

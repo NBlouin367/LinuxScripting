@@ -7,6 +7,7 @@
 #Due Date: Wednesday, August 4th, 2023.
 
 #user id check
+
 if [ "$EUID" -ne 0 ]; then
 
     echo "This script must be run as sudo/root. Either be root user or use sudo with the command to ensure it runs correctly." >&2
@@ -50,7 +51,7 @@ fi
 target1_management="remoteadmin@172.16.1.10"
 
 
-if ssh "$target1_management" << EOF
+if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
 
    echo "Going to configure target1-mgmt (172.16.1.10)"
@@ -218,7 +219,7 @@ if ssh "$target1_management" << EOF
 
        fi
 
-       echo "Adding a few tcp firewall rules."
+       echo "Adding firewall rules."
 
        ufw allow proto udp from 172.16.1.0/24 to any port 514
 
@@ -286,7 +287,10 @@ if ssh "$target1_management" << EOF
    fi
 
 
-echo "end of file hit"
+   echo "end of file hit"
+
+   echo "logging out of SSH Session on target 1"
+   logout
 
 EOF
 
@@ -305,7 +309,7 @@ fi
 
 target2_management="remoteadmin@172.16.1.11"
 
-if ssh "$target2_management" << EOF
+if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    echo "Configuring target 2 settings"
 
@@ -543,6 +547,7 @@ if ssh "$target2_management" << EOF
        echo "Failed to add *.* @loghost to /etc/rsyslog.conf"
 
    fi
+   logout
 
 EOF
 
@@ -574,6 +579,7 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" 'cat' << EOF
        exit 1
 
    fi
+   logout
 
 EOF
 
@@ -616,6 +622,7 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" 'cat' << EOF
        exit 1
 
    fi
+   logout
 
 EOF
 

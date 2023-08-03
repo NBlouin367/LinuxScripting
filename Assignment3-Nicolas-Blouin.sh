@@ -15,6 +15,38 @@ if [ "$EUID" -ne 0 ]; then
 
 fi
 
+echo "Checking if SSH is installed before proceeding"
+
+dpkg -s openssh-server &> /dev/null
+
+#when the exit status of the previous dpkg status command is not equal to 0 then run the package installs
+#since it is not installed on the system.
+
+if [ $? -ne 0 ]; then
+
+    echo "Installing SSH server..."
+
+    #installing openssh-server using the -y option just automatically assumes yes for all the install prompts.
+
+    apt-get install -y openssh-server > /dev/null
+
+    #when the exit status of the previous command is 0 meaning success run this if statment saying ssh install complete.
+
+    if [ $? -eq 0 ]; then
+
+        echo "openssh install complete."
+
+    #Using an else statement. This will handle an error. If the previous if statement checking exit status was not
+    #0 meaning success this else is then run and I use exit 1 to terminate the script with an error message.
+
+    else
+
+        echo "openssh failed to install. Terminating Script"
+        exit 1
+
+    fi
+fi
+
 target1_username="remoteadmin"
 target1_ip="172.16.1.10"
 

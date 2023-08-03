@@ -548,3 +548,77 @@ else
 fi
 
 
+# start of NMS Section
+
+if ssh "$target2_management" << EOF
+
+   systemctl is-active apache2 | grep -q "active"
+
+   if [ $? -eq 0 ]; then
+
+       echo "Apache2 is currently running on webhost"
+
+   else
+
+       echo "Apache2 is not running on webhost. Exiting script"
+       exit 1
+
+   fi
+
+EOF
+
+then
+
+    echo "Previous checks of Apache2 successful."
+
+else
+
+    echo "Failed previous checks of Apache2. Terminating Script"
+    exit 1
+
+fi
+
+
+if ssh "$target1_management" << EOF
+
+   systemctl is-active rsyslog | grep -q "active"
+
+   if [ $? -eq 0 ]; then
+
+       echo "Rsyslog is running on loghost"
+
+   else
+
+       echo "Rsyslog is not running on loghost. Exiting script"
+       exit 1
+
+   fi
+
+   grep -q "webhost" /var/log/syslog
+
+   if [ $? -eq 0 ]; then
+
+       echo "Logs are being received from webhost"
+
+   else
+
+       echo "Logs are not being received. Exiting script"
+       exit 1
+
+   fi
+
+EOF
+
+then
+
+    echo "Previous checks for rsyslog running and receiving logs from webhost success.."
+
+else
+
+    echo "rsyslog is not running and logs are not being received from webhost. Exiting Script."
+    exit 1
+
+fi
+
+
+#need to change NMS host file next

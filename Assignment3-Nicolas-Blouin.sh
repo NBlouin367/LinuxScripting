@@ -9,9 +9,9 @@
 #user id check
 if [ "$EUID" -ne 0 ]; then
 
-  echo "This script must be run as sudo/root. Either be root user or use sudo with the command to ensure it runs correctly." >&2
+    echo "This script must be run as sudo/root. Either be root user or use sudo with the command to ensure it runs correctly." >&2
 
-  exit 1
+    exit 1
 
 fi
 
@@ -50,241 +50,254 @@ fi
 target1_management="remoteadmin@172.16.1.10"
 
 
-echo "Going to configure target1-mgmt (172.16.1.10)"
+if ssh "$target1_management" << EOF
 
 
-if [[ $(hostname) != "loghost" ]]; then
+   echo "Going to configure target1-mgmt (172.16.1.10)"
 
-    echo "Updating the hostname to loghost"
-    echo "loghost" > /etc/hostname
-    hostnamectl set-hostname loghost
 
-    #if the exit status is 0, the hostname change was successful then display it worked
+   if [[ $(hostname) != "loghost" ]]; then
 
-    if [ $? -eq 0 ]; then
+       echo "Updating the hostname to loghost"
+       echo "loghost" > /etc/hostname
+       hostnamectl set-hostname loghost
 
-        echo "Hostname has been changed!"
+       #if the exit status is 0, the hostname change was successful then display it worked
 
-    #By using an else I can make sure I handle errors. When the condition of my previous if statement is not met the else will run.
-    #Since my if statement above was checking if exit status of the hostnamectl command was equal to 0 meaning success
-    #then any failures/outcomes would result in this else being executed. I display an error and then using exit 1
-    #I terminate the script.
+       if [ $? -eq 0 ]; then
 
-    else
+           echo "Hostname has been changed!"
 
-        echo "Attempt to change the hostname failed. Exiting Script"
-        exit 1
+       #By using an else I can make sure I handle errors. When the condition of my previous if statement is not met the else will run.
+       #Since my if statement above was checking if exit status of the hostnamectl command was equal to 0 meaning success
+       #then any failures/outcomes would result in this else being executed. I display an error and then using exit 1
+       #I terminate the script.
 
-    fi
+       else
 
-#if the if statement condition does not execute then run the else
-#it will just display some text saying the host name is already set up.
+           echo "Attempt to change the hostname failed. Exiting Script"
+           exit 1
 
+       fi
 
-else
+   #if the if statement condition does not execute then run the else
+   #it will just display some text saying the host name is already set up.
 
-    echo "Hostname is already set correctly."
 
-fi
+   else
 
-#Setting IP address on on management 1
+       echo "Hostname is already set correctly."
 
-echo "Setting IP address to host 3 on the LAN"
+   fi
 
-ip addr add 192.168.1.3/24 dev eth0
+   #Setting IP address on on management 1
 
-if [ $? -eq 0 ]; then
+   echo "Setting IP address to host 3 on the LAN"
 
-    echo "Successfully set IP to host number 3: IP address 192.168.1.3/24"
+   ip addr add 192.168.1.3/24 dev eth0
 
-else
+   if [ $? -eq 0 ]; then
 
-    echo "IP could not be setup correctly. Terminating script"
-    exit 1
+       echo "Successfully set IP to host number 3: IP address 192.168.1.3/24"
 
-fi
+   else
 
-#Adding machine webhost to /etc/hosts
+       echo "IP could not be setup correctly. Terminating script"
+       exit 1
 
-echo "Adding machine webhost to /etc/hosts"
+   fi
 
-echo "192.168.1.4 webhost" | sudo tee -a /etc/hosts
+   #Adding machine webhost to /etc/hosts
 
-if [ $? -eq 0 ]; then
+   echo "Adding machine webhost to /etc/hosts"
 
-    echo "Successfully added machine webhost"
+   echo "192.168.1.4 webhost" | sudo tee -a /etc/hosts
 
-else
+   if [ $? -eq 0 ]; then
 
-    echo "Failed to add webhost. Exiting Script."
-    exit 1
+       echo "Successfully added machine webhost"
 
-fi
+   else
 
-#Checking if ufw is installed
+       echo "Failed to add webhost. Exiting Script."
+       exit 1
 
-dpkg -s ufw &> /dev/null
+   fi
 
-if [ $? -ne 0 ]; then
+   #Checking if ufw is installed
 
-    echo "UFW is not installed."
-    echo "Going to install UFW"
+   dpkg -s ufw &> /dev/null
 
-    sudo apt-get install -y ufw > /dev/null
+   if [ $? -ne 0 ]; then
 
+       echo "UFW is not installed."
+       echo "Going to install UFW"
 
-    if [ $? -eq 0 ]; then
+       sudo apt-get install -y ufw > /dev/null
 
-        echo "Successfull installed UFW"
 
-    else
+       if [ $? -eq 0 ]; then
 
-        echo "UFW Install failed! Terminating the script"
-        exit 1
+           echo "Successfull installed UFW"
 
-    fi
+       else
 
-else
+           echo "UFW Install failed! Terminating the script"
+           exit 1
 
-    echo "UFW is already installed."
+       fi
 
-fi
+   else
 
-#this if statement is running the ufw status command. Once it runs it is piping the output to the grep command
-#to search for the pattern of Status: active. By using -w the grep command will do a whole word search.
-#if the phrase Status: active appears in the ufw status output then the if block runs.
+       echo "UFW is already installed."
 
+   fi
 
-if [ "$(ufw status | grep -w -q "Status: active")" ]; then
+   #this if statement is running the ufw status command. Once it runs it is piping the output to the grep command
+   #to search for the pattern of Status: active. By using -w the grep command will do a whole word search.
+   #if the phrase Status: active appears in the ufw status output then the if block runs.
 
-     echo "UFW firewall status already active."
-     echo "Adding firewall rules."
 
-     #Will add rules anyways even if the firewall is active
-     #Setting all the ports I want to allow in the firewall configuration.
+   if [ "$(ufw status | grep -w -q "Status: active")" ]; then
 
-     ufw allow proto udp from 172.16.1.0/24 to any port 514
+       echo "UFW firewall status already active."
+       echo "Adding firewall rules."
 
-     echo "Restarting/Reloading the firewall"
+       #Will add rules anyways even if the firewall is active
+       #Setting all the ports I want to allow in the firewall configuration.
 
-     #restarting the firewall to apply the new changes using the ufw reload command.
+       ufw allow proto udp from 172.16.1.0/24 to any port 514
 
-     ufw reload
+       echo "Restarting/Reloading the firewall"
 
-     #Using an if I can evaluate if the exit status of the ufw reload command was a 0 meaning a success.
-     #I then display a success message
+       #restarting the firewall to apply the new changes using the ufw reload command.
 
-     if [ $? -eq 0 ]; then
+       ufw reload
 
-         echo "Firewall was successfully Restarted/Reloaded."
+       #Using an if I can evaluate if the exit status of the ufw reload command was a 0 meaning a success.
+       #I then display a success message
 
-     #When the above if statement is not ran then that would mean an exit status other than 0 occured.
-     #My else statement will then execute displaying an error and I terminate the script with an exit 1.
+       if [ $? -eq 0 ]; then
 
-     else
+           echo "Firewall was successfully Restarted/Reloaded."
 
-         echo "Firewall could NOT restart. Terminating script."
-         exit 1
+       #When the above if statement is not ran then that would mean an exit status other than 0 occured.
+       #My else statement will then execute displaying an error and I terminate the script with an exit 1.
 
-     fi
+       else
 
-#when the firewall is not on run the else and enable it and apply rules to allow my listed ports
+           echo "Firewall could NOT restart. Terminating script."
+           exit 1
 
-else
+       fi
 
-    echo "Turning on UFW firewall."
+   #when the firewall is not on run the else and enable it and apply rules to allow my listed ports
 
-    #turn on the firewall using ufw enable command
+   else
 
-    ufw --force enable
+       echo "Turning on UFW firewall."
 
-    #If the exit status of my previous ufw enable command was 0 meaning success then run this if statement.
-    #I display a success message.
+       #turn on the firewall using ufw enable command
 
-    if [ $? -eq 0 ]; then
+       ufw --force enable
 
-        echo "Firewall was turned on successfully."
+       #If the exit status of my previous ufw enable command was 0 meaning success then run this if statement.
+       #I display a success message.
 
-    #When the previous if statement does not execute that would mean that the last command failed. This command being ufw enable
-    #I then use an else to handle the error displaying a message and terminating the script using exit 1.
+       if [ $? -eq 0 ]; then
 
-    else
+           echo "Firewall was turned on successfully."
 
-        echo "Firewall failed to enable and turn on. Stopping the script"
-        exit 1
+       #When the previous if statement does not execute that would mean that the last command failed. This command being ufw enable
+       #I then use an else to handle the error displaying a message and terminating the script using exit 1.
 
-    fi
+       else
 
-    echo "Adding a few tcp firewall rules."
+           echo "Firewall failed to enable and turn on. Stopping the script"
+           exit 1
 
-    ufw allow proto udp from 172.16.1.0/24 to any port 514
+       fi
 
-    echo "Restarting firewall"
+       echo "Adding a few tcp firewall rules."
 
-    #restart the firewall to apply my settings using the ufw reload command
+       ufw allow proto udp from 172.16.1.0/24 to any port 514
 
-    ufw reload
+       echo "Restarting firewall"
 
-    #Using an if to check if the exit status of my ufw reload command was a 0 meaning success. If a 0 then run this if statement.
+       #restart the firewall to apply my settings using the ufw reload command
 
-    if [ $? -eq 0 ]; then
+       ufw reload
 
-        echo "Firewall restarted successfully."
+       #Using an if to check if the exit status of my ufw reload command was a 0 meaning success. If a 0 then run this if statement.
 
-    #When the above if statement is not executed then the exit status of ufw reload was something other than a 0.
-    #My else statement will then execute displaying an error and I terminate the script with an exit 1.
+       if [ $? -eq 0 ]; then
 
-    else
+           echo "Firewall restarted successfully."
 
-        echo "Firewall could NOT restart properly. Terminating script"
-        exit 1
+       #When the above if statement is not executed then the exit status of ufw reload was something other than a 0.
+       #My else statement will then execute displaying an error and I terminate the script with an exit 1.
 
-    fi
+       else
 
+           echo "Firewall could NOT restart properly. Terminating script"
+           exit 1
 
-    echo "Firewall turned on and setup was successful!"
+       fi
 
-fi
 
-#Rsyslog stuff
+       echo "Firewall turned on and setup was successful!"
 
-sed -i 's/#module(load="imudp")/module(load="imudp")/' /etc/rsyslog.conf
+   fi
 
-if [ $? -eq 0 ]; then
+   #Rsyslog stuff
 
-    echo "Successfully uncommented lines."
+   sed -i 's/#module(load="imudp")/module(load="imudp")/' /etc/rsyslog.conf
 
-fi
+   if [ $? -eq 0 ]; then
 
-sed -i 's/#input(type="imudp" port="514")/input(type="imudp" port="514")/' /etc/rsyslog.conf
+       echo "Successfully uncommented lines."
 
-if [ $? -eq 0 ]; then
+   fi
 
-    echo "Successfully uncommented lines to enable UDP listening on port 514"
+   sed -i 's/#input(type="imudp" port="514")/input(type="imudp" port="514")/' /etc/rsyslog.conf
 
-fi
+   if [ $? -eq 0 ]; then
 
+       echo "Successfully uncommented lines to enable UDP listening on port 514"
 
-#Restart rsyslog
+   fi
 
-echo "Restarting rsyslog..."
 
-systemctl restart rsyslog
+   #Restart rsyslog
 
-if [ $? -eq 0 ]; then
+   echo "Restarting rsyslog..."
 
-    echo "Succesfully restarted rsyslog"
+   systemctl restart rsyslog
 
-else
+   if [ $? -eq 0 ]; then
 
-    echo "Could not restart rsyslog. Exiting script"
-    exit 1
+       echo "Succesfully restarted rsyslog"
 
-fi
+   else
+
+       echo "Could not restart rsyslog. Exiting script"
+       exit 1
+
+   fi
 
 
 echo "end of file hit"
 
 EOF
 
+then
+
+    echo "The previous configurations were successfull. No exit codes were set off"
+
+else
+
+    echo "Failed to apply configurations. Stopping script"
+    exit 1
+
+fi
 

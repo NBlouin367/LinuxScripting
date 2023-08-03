@@ -50,7 +50,7 @@ fi
 target1_management="remoteadmin@172.16.1.10"
 
 
-if ssh "$target1_management" << EOF
+if ssh -n "$target1_management" << EOF
 
 
    echo "Going to configure target1-mgmt (172.16.1.10)"
@@ -305,7 +305,7 @@ fi
 
 target2_management="remoteadmin@172.16.1.11"
 
-if ssh "$target2_management" << EOF
+if ssh -n "$target2_management" << EOF
 
    echo "Configuring target 2 settings"
 
@@ -560,7 +560,7 @@ fi
 
 # start of NMS Section
 
-if ssh "$target2_management" << EOF
+if ssh -n "$target2_management" << EOF
 
    systemctl is-active apache2 | grep -q "active"
 
@@ -589,7 +589,7 @@ else
 fi
 
 
-if ssh "$target1_management" << EOF
+if ssh -n "$target1_management" << EOF
 
    systemctl is-active rsyslog | grep -q "active"
 

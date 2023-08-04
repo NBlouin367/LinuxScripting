@@ -677,8 +677,12 @@ if [ $? -ne 0 ]; then
 fi
 
 
-if curl -s "http://webhost" | grep -q "Welcome to apache"; then
+if curl -s "http://webhost" | grep -q "Apache2 Default Page"; then
 
    echo "Successfully found webhost webpage at http://webhost"
+
+else
+
+    echo "Failed to find webhost page at hhtp://webhost"
 
 fi

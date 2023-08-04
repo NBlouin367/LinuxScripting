@@ -350,9 +350,7 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    apt-get update > /dev/null
 
-   dpkg -s apache2 &> /dev/null
-
-   if [ $? -ne 0 ]; then
+   if ! dpkg -s apache2 &> /dev/null; then
 
        echo "Apache2 is not installed."
        echo "Going to install Apache2."
@@ -645,5 +643,42 @@ if [ $? -eq 0 ]; then
 else
 
     echo "Failed to add loghost to /etc/hosts"
+
+fi
+
+dpkg -s curl &> /dev/null
+
+#when the exit status of the previous dpkg status command is not equal to 0 then run the package instal>
+#since it is not installed on the system.
+
+if [ $? -ne 0 ]; then
+
+    echo "Installing curl to check webpage"
+
+    #installing curl using the -y option just automatically assumes yes for all the install p>
+
+    apt-get install -y openssh-server > /dev/null
+
+    #when the exit status of the previous command is 0 meaning success run this if statment saying ssh >
+
+    if [ $? -eq 0 ]; then
+
+        echo "curl install complete."
+
+    #Using an else statement. This will handle an error. If the previous if statement checking exit sta>
+    #0 meaning success this else is then run and I use exit 1 to terminate the script with an error mes>
+
+    else
+
+        echo "curl failed to install. Terminating Script"
+        exit 1
+
+    fi
+fi
+
+
+if curl -s "http://webhost" | grep -q "Welcome to apache"; then
+
+   echo "Successfully found webhost webpage at http://webhost"
 
 fi

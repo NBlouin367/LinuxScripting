@@ -18,9 +18,9 @@ if [ "$EUID" -ne 0 ]; then
 
 fi
 
-echo "Updating package list, so packages install correctly"
+echo "Updating package list, so packages install correctly on host machine"
 
-apt update > /dev/dell
+apt-get update > /dev/dell
 
 echo "Checking if SSH is installed before proceeding"
 
@@ -60,8 +60,10 @@ target1_management="remoteadmin@172.16.1.10"
 if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
 
-   echo "Going to configure target1-mgmt (172.16.1.10)"
+   echo "Going to configure target1"
+   echo "Making sure packages are updated on this machine"
 
+   apt-get update > /dev/null
 
    if [[ $(hostname) != "loghost" ]]; then
 
@@ -344,6 +346,9 @@ target2_management="remoteadmin@172.16.1.11"
 if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    echo "Configuring target 2 settings"
+   echo "Making sure packages are updated on this machine"
+
+   apt-get update > /dev/null
 
    if [[ $(hostname) != "webhost" ]]; then
 
@@ -584,31 +589,6 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
    else
 
        echo "Apache2 is already installed."
-
-       if systemctl is-active -q apache2; then
-
-          echo "Apache2 is already running"
-
-       else
-
-           echo "Apache 2 is not running. Trying to start it"
-
-           systemctl start apache2
-
-           if systemctl is-active -q apache2; then
-
-              echo "Apache2 is now running"
-
-           else
-
-               echo "Failed to start Apache2"
-
-           fi
-
-
-
-       fi
-
 
    fi
 

@@ -556,6 +556,23 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
        if [ $? -eq 0 ]; then
 
            echo "Successfull installed Apache2"
+           echo "Starting apache2"
+
+           sudo systemctl start apache2
+
+           if systemctl is-active -q apache2; then
+
+               echo "Started Apache2 success and is active"
+
+           else
+
+               echo "Failed to start Apache2"
+               exit 1
+
+           fi
+
+       echo "Going to enable Apache2 for startups for future system boots"
+       systemctl enable apache2
 
        else
 
@@ -566,7 +583,32 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    else
 
-       echo "Apache is already installed."
+       echo "Apache2 is already installed."
+
+       if systemctl is-active -q apache2; then
+
+          echo "Apache2 is already running"
+
+       else
+
+           echo "Apache 2 is not running. Trying to start it"
+
+           systemctl start apache2
+
+           if systemctl is-active -q apache2; then
+
+              echo "Apache2 is now running"
+
+           else
+
+               echo "Failed to start Apache2"
+
+           fi
+
+
+
+       fi
+
 
    fi
 
@@ -581,20 +623,6 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
        echo "Failed to add *.* @loghost to /etc/rsyslog.conf"
 
    fi
-
-   systemctl is-active apache2 | grep -q "active"
-
-   if [ $? -eq 0 ]; then
-
-       echo "Apache 2 is running on webhost"
-
-   else
-
-       echo "Apache 2 is not running on webhost. Exiting Script"
-       exit 1
-
-   fi
-
 
 EOF
 

@@ -355,7 +355,7 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
        echo "Apache2 is not installed."
        echo "Going to install Apache2."
 
-       sudo apt-get install -y apache2 > /dev/null
+       sudo apt-get install -y apache2 &> /dev/null
 
 
        if [ $? -eq 0 ]; then

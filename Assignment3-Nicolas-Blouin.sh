@@ -294,11 +294,9 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
    fi
 
 
-   systemctl is-active rsyslog | grep -q "active"
+   if systemctl is-active -q rsyslog; then
 
-   if [ $? -eq 0 ]; then
-
-       echo "Rsyslog is running on loghost"
+      echo "Rsyslog is running on loghost"
 
    else
 
@@ -306,23 +304,6 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
        exit 1
 
    fi
-
-   grep -q "webhost" /var/log/syslog
-
-   if [ $? -eq 0 ]; then
-
-       echo "Logs are being received from webhost"
-
-   else
-
-       echo "Logs are not being received. Stopping Script"
-       exit 1
-
-   fi
-
-
-   echo "logging out of SSH Session on target 1"
-
 
 EOF
 

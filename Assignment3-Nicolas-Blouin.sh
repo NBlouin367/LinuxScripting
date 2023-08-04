@@ -657,7 +657,7 @@ if [ $? -ne 0 ]; then
 
     #installing curl using the -y option just automatically assumes yes for all the install p>
 
-    apt-get install -y openssh-server > /dev/null
+    apt-get install -y curl > /dev/null
 
     #when the exit status of the previous command is 0 meaning success run this if statment saying ssh >
 

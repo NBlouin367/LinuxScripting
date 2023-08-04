@@ -350,6 +350,50 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    apt-get update > /dev/null
 
+   dpkg -s apache2 &> /dev/null
+
+   if [ $? -ne 0 ]; then
+
+       echo "Apache2 is not installed."
+       echo "Going to install Apache2."
+
+       sudo apt-get install -y apache2 > /dev/null
+
+
+       if [ $? -eq 0 ]; then
+
+           echo "Successfull installed Apache2"
+           echo "Starting apache2"
+
+           sudo systemctl start apache2
+
+           if systemctl is-active -q apache2; then
+
+               echo "Started Apache2 success and is active"
+
+           else
+
+               echo "Failed to start Apache2"
+               exit 1
+
+           fi
+
+       echo "Going to enable Apache2 for startups for future system boots"
+       systemctl enable apache2
+
+       else
+
+           echo "Apache Install failed! Terminating the script"
+           exit 1
+
+       fi
+
+   else
+
+       echo "Apache2 is already installed."
+
+   fi
+
    if [[ $(hostname) != "webhost" ]]; then
 
        echo "Updating the hostname to webhost"
@@ -548,49 +592,6 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    fi
 
-   dpkg -s apache2 &> /dev/null
-
-   if [ $? -ne 0 ]; then
-
-       echo "Apache2 is not installed."
-       echo "Going to install Apache2."
-
-       sudo apt-get install -y apache2 > /dev/null
-
-
-       if [ $? -eq 0 ]; then
-
-           echo "Successfull installed Apache2"
-           echo "Starting apache2"
-
-           sudo systemctl start apache2
-
-           if systemctl is-active -q apache2; then
-
-               echo "Started Apache2 success and is active"
-
-           else
-
-               echo "Failed to start Apache2"
-               exit 1
-
-           fi
-
-       echo "Going to enable Apache2 for startups for future system boots"
-       systemctl enable apache2
-
-       else
-
-           echo "Apache Install failed! Terminating the script"
-           exit 1
-
-       fi
-
-   else
-
-       echo "Apache2 is already installed."
-
-   fi
 
    echo "*.* @loghost" | sudo tee -a /etc/rsyslog.conf
 

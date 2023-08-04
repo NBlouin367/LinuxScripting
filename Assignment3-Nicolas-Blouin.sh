@@ -6,8 +6,6 @@
 #Course Code: COMP2137
 #Due Date: Wednesday, August 4th, 2023.
 
-#updated script
-
 #user id check
 
 if [ "$EUID" -ne 0 ]; then

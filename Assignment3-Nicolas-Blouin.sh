@@ -81,8 +81,8 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
    echo "Going to configure target1"
    echo "Making sure packages are updated on this machine"
 
-   #I am updating the target1 machine package repo to make sure it has the most recent for
-   #installs of packages
+   #I am updating the target1 machine packages to make sure it has the most recent for
+   #needed installs of packages in my script
 
    apt-get update > /dev/null
 
@@ -314,9 +314,13 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    fi
 
-   #Rsyslog stuff
+   #Using sed -i option, this will make sure the file it edited directly. The file being modified here is the rsyslog.conf file
+   #the purpose of this command is to use substitution to replace the lines commented #module line I specified
+   #with the uncommented text I specified.
 
    sed -i 's/#module(load="imudp")/module(load="imudp")/' /etc/rsyslog.conf
+
+   #if the exit status of my previous sed command was 0 meaning it was successful and made the edits then I say success
 
    if [ $? -eq 0 ]; then
 
@@ -324,7 +328,13 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    fi
 
+   #using sed with the option -i meaning in place, i am editing the rsyslog.conf directly.
+   #My sed command is using substitution to replace the commented lines I specified with uncommented lines I specified.
+
    sed -i 's/#input(type="imudp" port="514")/input(type="imudp" port="514")/' /etc/rsyslog.conf
+
+   #if the previous sed command was succcessful the this if statement will execute due to exit status being equal to 0
+   #I then print a success message
 
    if [ $? -eq 0 ]; then
 
@@ -332,16 +342,21 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    fi
 
-
-   #Restart rsyslog
-
    echo "Restarting rsyslog..."
 
+   #I am now restarting rsyslog using systemctl restart command
+
    systemctl restart rsyslog
+
+   #if the previous systemctl command was a success this if statement runs due to
+   #exit staus being equal to 0
 
    if [ $? -eq 0 ]; then
 
        echo "Succesfully restarted rsyslog"
+
+   #when the exit staus was not equal to 0 then the else is ran, i output an error message and
+   #terminate the script with exit
 
    else
 
@@ -350,10 +365,14 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    fi
 
+   #using the systemctl is-active command I can check if rsyslog is running using -q I just keep the output quiet
 
    if systemctl is-active -q rsyslog; then
 
       echo "Rsyslog is running on loghost"
+
+   #If it isn't running then the else is ran and the script will terminate. The reason I exit it instead of
+   #trying to start it up was in the code above i have already restarted ryslog so it should be running.
 
    else
 
@@ -362,11 +381,18 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    fi
 
+#end of the SSH target1 session commands block
+
 EOF
+
+#If all the previous commands in the SSH session were successful I print a message out saying success.
 
 then
 
     echo "The previous configurations were successfull. No exit codes were set off"
+
+#if anything was unsuccessful then the script will terminate. The checks within the SSH should have caught errors
+#but this is just backup text
 
 else
 
@@ -376,30 +402,48 @@ else
 fi
 
 #Start of target 2 commands
+#I make a variable called target2_management and store remoteadmin@172.16.1.11 into it.
 
 target2_management="remoteadmin@172.16.1.11"
+
+#I now initiate an SSH session on target2 using the ssh command with the target@_management variable I made above
+#I use StrictHostKeyChecking set to no so that the user will not have to interact with the keyboard
+#and the script will just run automatically without interruptions
 
 if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    echo "Configuring target 2 settings"
    echo "Making sure packages are updated on this machine"
 
+   #I update the machines packages to the most recent
+
    apt-get update > /dev/null
+
+   #I am then checking if apache2 is installed, using dpkg -s to check the status. If the package is not
+   #installed then this block is ran below.
 
    if ! dpkg -s apache2 &> /dev/null; then
 
        echo "Apache2 is not installed."
        echo "Going to install Apache2."
 
+       #This will install apache2 on the system using -y will ensure all prompts are answered yes
+       #so that my script is not stopped and runs without user interaction
+
        sudo apt-get install -y apache2 &> /dev/null
 
+       #when the exit status of the previous apache2 install is 0 then the if statement is ran saying success
 
        if [ $? -eq 0 ]; then
 
            echo "Successfull installed Apache2"
            echo "Starting apache2"
 
+           #I then ensure apache2 is started using the systemctl start apache2 command
+
            sudo systemctl start apache2
+
+           #I check if apache2 is running using systemctl is-active. using -q I keep the output quiet.
 
            if systemctl is-active -q apache2; then
 

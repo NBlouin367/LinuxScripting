@@ -174,11 +174,11 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    fi
 
-   #Checking if ufw is installed using dpkg -s to see if it's on the system 
+   #Checking if ufw is installed using dpkg -s to see if it's on the system
 
    dpkg -s ufw &> /dev/null
 
-   #when the exit status of the package check status is not equal to 0 meaning uninstalled, the if 
+   #when the exit status of the package check status is not equal to 0 meaning uninstalled, the if
    #will run
 
    if [ $? -ne 0 ]; then
@@ -186,7 +186,7 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
        echo "UFW is not installed."
        echo "Going to install UFW"
 
-       #I then use apt-get to install ufw on the system using -y it will say yes to all prompts 
+       #I then use apt-get to install ufw on the system using -y it will say yes to all prompts
        #automatically so the script runs without stopping
 
        sudo apt-get install -y ufw > /dev/null
@@ -263,7 +263,7 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
        #turn on the firewall using ufw enable command
 
-       ufw --force enable
+       ufw enable
 
        #If the exit status of my previous ufw enable command was 0 meaning success then run this if statement.
        #I display a success message.
@@ -575,7 +575,7 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
        #turn on the firewall using ufw enable command
 
-       ufw --force enable
+       ufw enable
 
        #If the exit status of my previous ufw enable command was 0 meaning success then run this if statement.
        #I display a success message.

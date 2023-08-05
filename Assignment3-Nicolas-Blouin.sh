@@ -6,7 +6,16 @@
 #Course Code: COMP2137
 #Due Date: Wednesday, August 4th, 2023.
 
-#user id check
+
+#Script Description:
+#The purpose of my script is to alter the remoteloy connect to target machines and change
+#the configurations on the remote machine
+
+#I am using an if statement to check whether or not the person trying to run the script
+#is running with root privileges. By using the environment variable $EUID I am able to check effective user ID of the current user.
+#When the current user ID when running the script is not equal to 0 meaning root I display an error message and
+#exit 1 will terminate my script. the user ID needs to be a 0 to pass this check and
+#run the remainder of my script.
 
 if [ "$EUID" -ne 0 ]; then
 
@@ -18,9 +27,14 @@ fi
 
 echo "Updating package list, so packages install correctly on host machine"
 
+#Update the packages on the machine running the script so that open ssh will install with the most
+#updated packages
+
 apt-get update > /dev/dell
 
 echo "Checking if SSH is installed before proceeding"
+
+#I check the status of openssh-server using dpkg -s to check if the package is on the system or not
 
 dpkg -s openssh-server &> /dev/null
 
@@ -52,8 +66,14 @@ if [ $? -ne 0 ]; then
     fi
 fi
 
+#Storing the value remoteadmin@172.16.1.10 into a variable called target1_management to use later for ssh connections
+
 target1_management="remoteadmin@172.16.1.10"
 
+
+#I am now using ssh to connect to the target 1 machine using the remote address
+#using StrictHostKeyCheck this will disable the prompt for the user to type y when connecting
+#this will ensure the script doesn't need to pause.
 
 if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
@@ -61,11 +81,21 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
    echo "Going to configure target1"
    echo "Making sure packages are updated on this machine"
 
+   #I am updating the target1 machine package repo to make sure it has the most recent for
+   #installs of packages
+
    apt-get update > /dev/null
+
+   #Using an if I can check if the host name is not equal to log host. if it isn't set to log host
+   #this if block is ran
 
    if [[ $(hostname) != "loghost" ]]; then
 
        echo "Updating the hostname to loghost"
+
+       #I am adding loghost to the hostname file and then using hostnamectl set-hostname
+       #I can set the machine name to loghost
+
        echo "loghost" > /etc/hostname
        hostnamectl set-hostname loghost
 
@@ -97,15 +127,20 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    fi
 
-   #Setting IP address on on management 1
+   #Setting IP address of the target 1 machine using ip addr add command
 
    echo "Setting IP address to host 3 on the LAN"
 
    ip addr add 192.168.16.3/24 dev eth0
 
+   #if the previous ip add command works then the exit status of 0 will make this if statement run
+   #saying the IP was setup
+
    if [ $? -eq 0 ]; then
 
        echo "Successfully set IP to host number 3"
+
+   #otherwise if the exit staus was not a 0 it failed so this else if ran saying IP was not setup
 
    else
 
@@ -115,14 +150,22 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
    fi
 
    #Adding machine webhost to /etc/hosts
+   #using the echo command I am adding the address of 198.168.16.4 and the name webhost next to it
+   #into /etc/hosts. By using a pipe I am taking the echo value and passing into the tee command which
+   #writes it my specified location being /etc/hosts
 
    echo "Adding machine webhost to /etc/hosts"
 
    echo "198.168.16.4 webhost" | sudo tee -a /etc/hosts
 
+   #when the previous command was successful an if block will execute saying success as the exit 
+   #status was 0
+
    if [ $? -eq 0 ]; then
 
        echo "Successfully added machine webhost"
+
+   #else is ran if the previous if didn't execute and exits the script using exit 1 indicating failure
 
    else
 
@@ -131,21 +174,32 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    fi
 
-   #Checking if ufw is installed
+   #Checking if ufw is installed using dpkg -s to see if it's on the system 
 
    dpkg -s ufw &> /dev/null
+
+   #when the exit status of the package check status is not equal to 0 meaning uninstalled, the if 
+   #will run
 
    if [ $? -ne 0 ]; then
 
        echo "UFW is not installed."
        echo "Going to install UFW"
 
+       #I then use apt-get to install ufw on the system using -y it will say yes to all prompts 
+       #automatically so the script runs without stopping
+
        sudo apt-get install -y ufw > /dev/null
 
+       #when the previous command of ufw installing is exit status 0 the if is ran saying success
 
        if [ $? -eq 0 ]; then
 
            echo "Successfull installed UFW"
+
+
+       #This else if ran if the previous if didn't execute maing the ufw failed to install
+       #Then using exit 1 I stop the script
 
        else
 
@@ -153,6 +207,9 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
            exit 1
 
        fi
+
+   #when the connected if statement above doesn't execute then ufw was already installed
+   #and this else is ran syaing it's already installed
 
    else
 

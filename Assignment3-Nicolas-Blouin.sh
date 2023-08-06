@@ -4,7 +4,7 @@
 #Name: Nicolas Blouin
 #Student ID: 200410446
 #Course Code: COMP2137
-#Due Date: Wednesday, August 4th, 2023.
+#Due Date: Friday, August 4th, 2023.
 
 
 #Script Description:
@@ -127,7 +127,7 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    fi
 
-   #Setting IP address of the target 1 machine using ip addr add command
+   #Adding IP address on the target 1 machine using ip addr add command
 
    echo "Setting IP address to host 3 on the LAN"
 
@@ -439,15 +439,19 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
            echo "Successfull installed Apache2"
            echo "Starting apache2"
 
-           #I then ensure apache2 is started using the systemctl start apache2 command
+           #I then ensure apache2 is started using the systemctl start Apache2 command
 
            sudo systemctl start apache2
 
-           #I check if apache2 is running using systemctl is-active. using -q I keep the output quiet.
+           #I check if Apache2 is running using systemctl is-active. using -q I keep the output quiet.
+           #if it is running then say it's active
 
            if systemctl is-active -q apache2; then
 
                echo "Started Apache2 success and is active"
+
+           #the else is executed when the above if is not triggered. This would indicate that Apache2 is no
+           #running then this means it failed to start from the above command. So I exit the script as it failed to start.
 
            else
 
@@ -457,7 +461,13 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
            fi
 
        echo "Going to enable Apache2 for startups for future system boots"
+
+       #I then enable Apache2 to make sure it will startup again if the machine were to be restarted
+
        systemctl enable apache2
+
+       #when the previous if statement above for this block didn't execute this means exit status of apache2 was
+       #not a 0 meaning failure so the else is ran, so I exit the script with an error message
 
        else
 
@@ -466,15 +476,24 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
        fi
 
+   #if the above if statement for this block didn't trigger this would mean Apache2 was already installed.
+   #so the else is ran and I give a message saying Apache2 is installed
+
    else
 
        echo "Apache2 is already installed."
 
    fi
 
+   #If the hostname on this machine is not equal to webhost then this if statment is ran to change it
+
    if [[ $(hostname) != "webhost" ]]; then
 
        echo "Updating the hostname to webhost"
+
+       #I add webhost to /etc/hostname, I then set the hostname on the machine to webhost using
+       #the hostnamectl set-hostname command
+
        echo "webhost" > /etc/hostname
        hostnamectl set-hostname webhost
 
@@ -507,15 +526,21 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
    fi
 
 
-   #Setting IP address on on management 2
-
    echo "Setting IP address to host 4 on the LAN"
 
+   #Using the ip addr add command I am adding the following IP to the target2 machine
+
    ip addr add 192.168.16.4/24 dev eth0
+
+   #if the exit status of the previous ip addr add command
+   #was a 0 meaning success then say successful
 
    if [ $? -eq 0 ]; then
 
        echo "Successfully set IP to host number 4"
+
+   #since the  above if statement didn't execute that means the exit status was not a 0.
+   #This would mean the IP command failed. I say it was not setup and exit the script
 
    else
 
@@ -524,15 +549,23 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    fi
 
-   #Adding machine losthost to /etc/hosts
 
    echo "Adding machine loghost to /etc/hosts"
 
+   #I add the address 192.168.16.3 and the name loghost to the /etc/hosts file using a pipe into
+   #the tee command which will write contents to my specified file.
+
    echo "192.168.16.3 loghost" | sudo tee -a /etc/hosts
+
+   #if the previous command gave an exit status of 0 meaning success, the if statement is ran
+   #and I print out a message sating successfully added
 
    if [ $? -eq 0 ]; then
 
        echo "Successfully added machine loghost"
+
+   #since the previous if didn't trigger then the exit status would have been anything but a 0
+   #so my else is ran and I say failed and exit the script
 
    else
 
@@ -543,21 +576,33 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
 
 
-   #firewall portion
+   #I check if ufw is installed on the machine using dpkf -s to retrieve
+   #the status of the package
 
    dpkg -s ufw &> /dev/null
+
+   #when the exit status of the previous dpkg command is not equal to 0 this will mean it isn't
+   #installed so my if statement will then run
 
    if [ $? -ne 0 ]; then
 
        echo "UFW is not installed."
        echo "Going to install UFW"
 
+       #I then installed ufw on the system and use -y to say yes
+       #to all the install prompts
+
        sudo apt-get install -y ufw > /dev/null
 
+       #When the previous command installing ufw gives an exit status 0, this means that
+       #it was a success and this if statement is ran saying success
 
        if [ $? -eq 0 ]; then
 
            echo "Successfull installed UFW"
+
+       #when the above if is not ran then this else would run. This  would mean the ufw install gave
+       #an exit status of anything but a 0 which is a failure. I say failure message and end the script
 
        else
 
@@ -565,6 +610,9 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
            exit 1
 
        fi
+
+   #when the above if statement that checks for ufw installation is not ran this
+   #means ufw was already installed. I then say ufw is already installed
 
    else
 
@@ -670,6 +718,7 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    fi
 
+   #
 
    echo "*.* @loghost" | sudo tee -a /etc/rsyslog.conf
 

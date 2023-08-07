@@ -158,7 +158,7 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
    echo "198.168.16.4 webhost" | sudo tee -a /etc/hosts
 
-   #when the previous command was successful an if block will execute saying success as the exit 
+   #when the previous command was successful an if block will execute saying success as the exit
    #status was 0
 
    if [ $? -eq 0 ]; then
@@ -553,7 +553,7 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
    echo "Adding machine loghost to /etc/hosts"
 
    #I add the address 192.168.16.3 and the name loghost to the /etc/hosts file using a pipe into
-   #the tee command which will write contents to my specified file.
+   #the tee command which will write contents to my specified file. Using -a I append the contents.
 
    echo "192.168.16.3 loghost" | sudo tee -a /etc/hosts
 
@@ -718,13 +718,22 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    fi
 
-   #
+   #I am using echo *.* @loghost and piping it to the tee command which
+   #will write my echo contents to the file I specify, this file being rsyslog.conf.
+   #I use the -a option to append to the file so it won't just overwrite.
 
    echo "*.* @loghost" | sudo tee -a /etc/rsyslog.conf
+
+   #If the previous command gave an exit status of 0, that would mean success
+   #so then my if statement is ran saying success
 
    if [ $? -eq 0 ]; then
 
        echo "*.* @loghost added to /etc/rsyslog.conf success"
+
+   #when the above if statement doesn't execute then my else is ran.
+   #this would mean the exit code wasn't 0, meaning an error.
+   #I then say failed in the output
 
    else
 
@@ -732,11 +741,19 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    fi
 
+#This is the end of my target2 SSH session commands block
+
 EOF
+
+#if no errors occured then I say success for target2 settings. Previous errors should be caught
+#by my error checking.
 
 then
 
     echo "Target2 settings were updated successfully. No error exit status codes from previous commands."
+
+#If something errors within the SSH session then an extra error message is outputted
+#the script is also terminated
 
 else
 
@@ -746,22 +763,43 @@ else
 fi
 
 
+
 echo "Configuring NMS Settings..."
 
+#using sed I am using the -i option to set inplace editing so the file is being edited.
+#This will search for lines within /etc/hosts that contain loghost or webhost and delete them
+#hence the d at the end of the sed command. I am emptying the hosts file so I can't produce duplicates
+#if the system were to have loghost and webhost already
 
 sed -i '/\(loghost\|webhost\)/d' /etc/hosts
 
+#I am using echo command then piping the output to the tee command to write
+#the contents 192.168.16.3 loghost into /etc/hosts. Using the tee command with the -a option
+#makes it append the contents to the file I specfied, this being /etc/hosts.
+
 echo "192.168.16.3 loghost" | sudo tee -a /etc/hosts
+
+#When my previous command exit status is a 0, this if statement runs saying success
 
 if [ $? -eq 0 ]; then
 
     echo "Successfully added loghost to /etc/hosts"
+
+#When the above if statement doesn't run this else is then ran.
+#This would mean the exit status of the previous command was anything but a 0
+#which is an error. I then say error
 
 else
 
     echo "Failed to add loghost to /etc/hosts"
 
 fi
+
+#Adding 192.168.16.4 webhost to /etc/hosts. I use the echo command
+#with my text, I then pipe into the tee command. What this does is
+#writes it to the file I specified, this being /etc/hosts.
+#When using the tee command with the -a option, I am appending to my specified file,
+#this file being /etc/hosts
 
 echo "192.168.16.4 webhost" | sudo tee -a /etc/hosts
 

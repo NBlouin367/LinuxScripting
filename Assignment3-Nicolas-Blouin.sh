@@ -8,8 +8,8 @@
 
 
 #Script Description:
-#The purpose of my script is to alter the remoteloy connect to target machines and change
-#the configurations on the remote machine
+#The purpose of my script is to remotely connect to target machines and change
+#the configurations.
 
 #I am using an if statement to check whether or not the person trying to run the script
 #is running with root privileges. By using the environment variable $EUID I am able to check effective user ID of the current user.

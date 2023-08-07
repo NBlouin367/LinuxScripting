@@ -733,11 +733,12 @@ if ssh -o StrictHostKeyChecking=no "$target2_management" << EOF
 
    #when the above if statement doesn't execute then my else is ran.
    #this would mean the exit code wasn't 0, meaning an error.
-   #I then say failed in the output
+   #I then say failed in the output and stop the script
 
    else
 
-       echo "Failed to add *.* @loghost to /etc/rsyslog.conf"
+       echo "Failed to add *.* @loghost to /etc/rsyslog.conf. Stopping Script"
+       exit 1
 
    fi
 
@@ -787,11 +788,12 @@ if [ $? -eq 0 ]; then
 
 #When the above if statement doesn't run this else is then ran.
 #This would mean the exit status of the previous command was anything but a 0
-#which is an error. I then say error
+#which is an error. I then say error and terminate the script
 
 else
 
-    echo "Failed to add loghost to /etc/hosts"
+    echo "Failed to add loghost to /etc/hosts. Stopping the script"
+    exit 1
 
 fi
 
@@ -803,50 +805,70 @@ fi
 
 echo "192.168.16.4 webhost" | sudo tee -a /etc/hosts
 
+#Using this if statment I am checking the exit status of the previous command
+#If the exit status is 0 that means success, this if statment will run and
+#It will then say success
+
 if [ $? -eq 0 ]; then
 
     echo "Successfully added loghost to /etc/hosts"
 
+#when the above if statement does not execute this else statement will run.
+#This would mean the exit status of my previous command was gave anything but a 0
+#meaning an error occured. I then say failed and exit the script
+
 else
 
     echo "Failed to add loghost to /etc/hosts"
+    exit 1
 
 fi
 
+#I am using dpkg -s to check the status of curl to see if it
+#is installed on the system.
+
 dpkg -s curl &> /dev/null
 
-#when the exit status of the previous dpkg status command is not equal to 0 then run the package instal>
+#when the exit status of the previous dpkg status command is not equal to 0 then run the package install
 #since it is not installed on the system.
 
 if [ $? -ne 0 ]; then
 
     echo "Installing curl to check webpage"
 
-    #installing curl using the -y option just automatically assumes yes for all the install p>
+    #installing curl using the -y option just automatically assumes yes for all the install prompts
 
     apt-get install -y curl > /dev/null
 
-    #when the exit status of the previous command is 0 meaning success run this if statment saying ssh >
+    #when the exit status of the previous command is 0 meaning success run this if statment saying install complete
 
     if [ $? -eq 0 ]; then
 
         echo "curl install complete."
 
-    #Using an else statement. This will handle an error. If the previous if statement checking exit sta>
-    #0 meaning success this else is then run and I use exit 1 to terminate the script with an error mes>
+    #When the above if statement doesn't execute, then this else statement will run.
+    #This would mean the previous command gave an exit status of anything but a 0
+    #This means an error, I then say failed and exit the script
 
     else
 
-        echo "curl failed to install. Terminating Script"
+        echo "Curl failed to install. Terminating Script"
         exit 1
 
     fi
 fi
 
+#Using an if statement, I am checking if I can retrieve the contents of http://webhost
+#if curl can retrieve the contents I then take that output and pipe it into the grep command
+#using grep I am searching for the text Apache2 Default Page, which is the home page headline
+#if all these conditions are met then I will say success
 
 if curl -s "http://webhost" | grep -q "Apache2 Default Page"; then
 
-   echo "Successfully found webhost webpage at http://webhost"
+   echo "Successfully found webpage at http://webhost"
+
+#when the above if statement doesn't execute then that would mean the conditions of finding the webpage were not met
+#the else statement will then run saying failure. Exit was not needed here as this is the end of the script
 
 else
 

@@ -828,7 +828,7 @@ echo "192.168.16.4 webhost" | sudo tee -a /etc/hosts
 
 if [ $? -eq 0 ]; then
 
-    echo "Successfully added loghost to /etc/hosts"
+    echo "Successfully added webhost to /etc/hosts"
 
 #when the above if statement does not execute this else statement will run.
 #This would mean the exit status of my previous command was gave anything but a 0
@@ -836,7 +836,7 @@ if [ $? -eq 0 ]; then
 
 else
 
-    echo "Failed to add loghost to /etc/hosts"
+    echo "Failed to add webhost to /etc/hosts"
     exit 1
 
 fi
@@ -861,7 +861,7 @@ if [ $? -ne 0 ]; then
 
     if [ $? -eq 0 ]; then
 
-        echo "curl install complete."
+        echo "Curl install complete."
 
     #When the above if statement doesn't execute, then this else statement will run.
     #This would mean the previous command gave an exit status of anything but a 0

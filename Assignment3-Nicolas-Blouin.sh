@@ -152,7 +152,7 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
    #Adding machine webhost to /etc/hosts
    #using the echo command I am adding the address of 198.168.16.4 and the name webhost next to it
    #into /etc/hosts. By using a pipe I am taking the echo value and passing into the tee command which
-   #writes it my specified location being /etc/hosts
+   #writes it my specified location being /etc/hosts. Using the -a option makes sure to append it to the file.
 
    echo "Adding machine webhost to /etc/hosts"
 
@@ -209,7 +209,7 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
        fi
 
    #when the connected if statement above doesn't execute then ufw was already installed
-   #and this else is ran syaing it's already installed
+   #and this else is ran saying it's already installed
 
    else
 
@@ -326,6 +326,14 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
 
        echo "Successfully uncommented lines."
 
+   #When the above if statement doesn't execute then then my previous command would have
+   #gave an exit staus of anything but a 0, meaning an error. I then say failed and exit the script
+
+   else
+
+       echo "Failed to uncomment lines from rsyslog.conf"
+       exit 1
+
    fi
 
    #using sed with the option -i meaning in place, i am editing the rsyslog.conf directly.
@@ -339,6 +347,15 @@ if ssh -o StrictHostKeyChecking=no "$target1_management" << EOF
    if [ $? -eq 0 ]; then
 
        echo "Successfully uncommented lines to enable UDP listening on port 514"
+
+   #when the above if doesn't trigger then this else statement is ran this means my
+   #previous command gave an exit status other than 0. This would mean an error occured.
+   #I then print an error message and terminate the script using exit 1 
+
+   else
+
+       echo "Failed to uncomment lines to enable UDP listening on port 514"
+       exit 1
 
    fi
 
